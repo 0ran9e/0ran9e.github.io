@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.2.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next-me.png?v=6.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next-me.png?v=6.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next-me.png?v=6.2.0">
+
+
+  <link rel="mask-icon" href="/images/logo-me.svg?v=6.2.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="这周的题目很有趣，我们会用”一对多”的逻辑回归与神经网络算法分别来实现手写数字的识别，因此也需要我们尽量做到矢量化来提高运算的效率。 Multi-class Classification在本练习中，我们要实现用逻辑回归以及神级网络来识别手写数字（从0到9）。自动识别手写数字有着非常宽泛的应用，从邮件信封上的邮政编码到识别银行支票上的金额等，都有着很广泛的应用。在练习的第一部分，我们将扩展之前的逻辑">
+<meta name="keywords" content="机器学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器学习：编程作业（三）">
+<meta property="og:url" content="http://0ran9e.com/2018/04/30/机器学习：编程作业（三）/index.html">
+<meta property="og:site_name" content="0ran9e&#39;s Blog">
+<meta property="og:description" content="这周的题目很有趣，我们会用”一对多”的逻辑回归与神经网络算法分别来实现手写数字的识别，因此也需要我们尽量做到矢量化来提高运算的效率。 Multi-class Classification在本练习中，我们要实现用逻辑回归以及神级网络来识别手写数字（从0到9）。自动识别手写数字有着非常宽泛的应用，从邮件信封上的邮政编码到识别银行支票上的金额等，都有着很广泛的应用。在练习的第一部分，我们将扩展之前的逻辑">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://p7jn6eeff.bkt.clouddn.com/ML/ex3/1.png">
+<meta property="og:image" content="http://p7jn6eeff.bkt.clouddn.com/ML/ex3/2.png">
+<meta property="og:updated_time" content="2018-04-30T10:50:50.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="机器学习：编程作业（三）">
+<meta name="twitter:description" content="这周的题目很有趣，我们会用”一对多”的逻辑回归与神经网络算法分别来实现手写数字的识别，因此也需要我们尽量做到矢量化来提高运算的效率。 Multi-class Classification在本练习中，我们要实现用逻辑回归以及神级网络来识别手写数字（从0到9）。自动识别手写数字有着非常宽泛的应用，从邮件信封上的邮政编码到识别银行支票上的金额等，都有着很广泛的应用。在练习的第一部分，我们将扩展之前的逻辑">
+<meta name="twitter:image" content="http://p7jn6eeff.bkt.clouddn.com/ML/ex3/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://0ran9e.com/2018/04/30/机器学习：编程作业（三）/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>机器学习：编程作业（三） | 0ran9e's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">0ran9e's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">心之所向 素履以往</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://0ran9e.com/2018/04/30/机器学习：编程作业（三）/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="0ran9e">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="0ran9e's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">机器学习：编程作业（三）
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-04-30 00:05:33" itemprop="dateCreated datePublished" datetime="2018-04-30T00:05:33+08:00">2018-04-30</time>
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/机器学习/" itemprop="url" rel="index"><span itemprop="name">机器学习</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这周的题目很有趣，我们会用”一对多”的逻辑回归与神经网络算法分别来实现手写数字的识别，因此也需要我们尽量做到矢量化来提高运算的效率。</p>
+<h1 id="Multi-class-Classification"><a href="#Multi-class-Classification" class="headerlink" title="Multi-class Classification"></a>Multi-class Classification</h1><p>在本练习中，我们要实现用逻辑回归以及神级网络来识别手写数字（从0到9）。自动识别手写数字有着非常宽泛的应用，从邮件信封上的邮政编码到识别银行支票上的金额等，都有着很广泛的应用。在练习的第一部分，我们将扩展之前的逻辑回归并将其用在一对多的分类问题中。</p>
+<a id="more"></a>
+<h2 id="Dataset"><a href="#Dataset" class="headerlink" title="Dataset"></a>Dataset</h2><p>在作业的文件中，有一个名为 <em>ex3data1.mat</em> 的数据文件。因为他是 <em>.mat</em> 类型文件，意味着数据已经以规定好的矩阵格式存储了。我们可以直接用 <em>load( )</em> 函数来加载它，就能正确地将维度和值存入程序的内存中，并且也不需要对它做像之前那些 <em>.txt</em> 文件的命名。</p>
+<p>训练集有5000个样例，每一个样例都是该数字的20像素乘20像素的灰度图像，每个像素由浮点值表示该位置的灰度强度。20×20的像素展开为400维度的行向量保存在我们训练集中，因此我们被提供了一个 <em>5000×400</em> 的矩阵 <em>X</em>  ，每一行是一个手写数字图像的样例。</p>
+<p>训练集的第二部分是包含了训练集标签的5000维向量 <em>y</em> 。为了与MATLAB的索引更加兼容，作业将数字 <em>0</em> 映射为值 <em>10</em> ，其余数字按其正常顺序标记。</p>
+<h2 id="Visualizing-the-data"><a href="#Visualizing-the-data" class="headerlink" title="Visualizing the data"></a>Visualizing the data</h2><p>和往常一样，我们一开始通常会可视化训练集以获得灵感。这题调用一个已经帮我们写好的函数 <em>displayData( )</em> ，它的功能是从训练集中随机选100行，把每一行映射到20像素乘20像素的灰度图像上，最后将他们一起显示出来。这个函数的实现不太简单，但MATLAB不是我们学习的重点，代码放在这里给哪天学习的时候备用吧。</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[h, display_array]</span> = <span class="title">displayData</span><span class="params">(X, example_width)</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">% Set example_width automatically if not passed in</span></span><br><span class="line"><span class="keyword">if</span> ~exist(<span class="string">'example_width'</span>, <span class="string">'var'</span>) || <span class="built_in">isempty</span>(example_width) </span><br><span class="line">	example_width = <span class="built_in">round</span>(<span class="built_in">sqrt</span>(<span class="built_in">size</span>(X, <span class="number">2</span>)));</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">% Gray Image</span></span><br><span class="line">colormap(gray);</span><br><span class="line"></span><br><span class="line"><span class="comment">% Compute rows, cols</span></span><br><span class="line">[m n] = <span class="built_in">size</span>(X);</span><br><span class="line">example_height = (n / example_width);</span><br><span class="line"></span><br><span class="line"><span class="comment">% Compute number of items to display</span></span><br><span class="line">display_rows = <span class="built_in">floor</span>(<span class="built_in">sqrt</span>(m));</span><br><span class="line">display_cols = <span class="built_in">ceil</span>(m / display_rows);</span><br><span class="line"></span><br><span class="line"><span class="comment">% Between images padding</span></span><br><span class="line">pad = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">% Setup blank display</span></span><br><span class="line">display_array = - <span class="built_in">ones</span>(pad + display_rows * (example_height + pad), ...</span><br><span class="line">                       pad + display_cols * (example_width + pad));</span><br><span class="line"></span><br><span class="line"><span class="comment">% Copy each example into a patch on the display array</span></span><br><span class="line">curr_ex = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">for</span> <span class="built_in">j</span> = <span class="number">1</span>:display_rows</span><br><span class="line">	<span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">1</span>:display_cols</span><br><span class="line">		<span class="keyword">if</span> curr_ex &gt; m, </span><br><span class="line">			<span class="keyword">break</span>; </span><br><span class="line">		<span class="keyword">end</span></span><br><span class="line">		<span class="comment">% Copy the patch</span></span><br><span class="line">		</span><br><span class="line">		<span class="comment">% Get the max value of the patch</span></span><br><span class="line">		max_val = <span class="built_in">max</span>(<span class="built_in">abs</span>(X(curr_ex, :)));</span><br><span class="line">		display_array(pad + (<span class="built_in">j</span> - <span class="number">1</span>) * (example_height + pad) + (<span class="number">1</span>:example_height), ...</span><br><span class="line">		              pad + (<span class="built_in">i</span> - <span class="number">1</span>) * (example_width + pad) + (<span class="number">1</span>:example_width)) = ...</span><br><span class="line">						<span class="built_in">reshape</span>(X(curr_ex, :), example_height, example_width) / max_val;</span><br><span class="line">		curr_ex = curr_ex + <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	<span class="keyword">if</span> curr_ex &gt; m, </span><br><span class="line">		<span class="keyword">break</span>; </span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">% Display Image</span></span><br><span class="line">h = imagesc(display_array, [<span class="number">-1</span> <span class="number">1</span>]);</span><br><span class="line"></span><br><span class="line"><span class="comment">% Do not show axis</span></span><br><span class="line">axis image off</span><br><span class="line"></span><br><span class="line">drawnow;</span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p><img src="http://p7jn6eeff.bkt.clouddn.com/ML/ex3/1.png" alt=""></p>
+<h2 id="Vectorizing-Logistic-Regression"><a href="#Vectorizing-Logistic-Regression" class="headerlink" title="Vectorizing Logistic Regression"></a>Vectorizing Logistic Regression</h2><p>正如开篇所提到的，我们将要用一对多逻辑回归模型来构建多类分类器，因为有十个分类，所以为了更有效率，代码的矢量化非常重要。在这节中，我们要实现逻辑回归的矢量化版本，它不使用任何的for循环。其实这和我们上次做的练习几乎一样，感觉这是为了帮助我们复习才布置的…</p>
+<h3 id="Vectorizing-the-cost-function"><a href="#Vectorizing-the-cost-function" class="headerlink" title="Vectorizing the cost function"></a>Vectorizing the cost function</h3><p>在非正则化的逻辑回归中，成本函数是<br>$$<br>J(θ) = \frac{1}{m}\sum^{m}<em>{i=1}{[-y^{(i)}log(h</em>{θ}(x^{(i)}))-(1-y^{(i)})log(1-h_{θ}(x^{(i)}))]}<br>$$<br>为了计算求和中的每个元素，我们必须为每个 <em>i</em> 计算 $h_{θ}(x^{(i)})$ ，其中 $h_{θ}(x^{(i)}) = g(θ^{T}x^{(i)})$ 并且 $g(z) = \frac{1}{1+e^{-z}}$ 是 <em>sigmoid</em> 函数。事实证明我们可以利用矩阵来快速计算所有示列。让我们定义 X 和 <em>θ</em> 为：<br>$$<br>X = \begin{bmatrix}<br>\ —\ (x^{(1)})^{T} \ — \ \<br>\ —\ (x^{(2)})^{T} \ — \ \<br>.\.\<br>\ —\ (x^{(m)})^{T} \ — \ \<br>\end{bmatrix}        \quad and \quad θ=\begin{bmatrix}<br>                                θ<em>{0}\<br>                                θ</em>{1}\<br>                                .\.\<br>                                θ_{n}<br>                                \end{bmatrix}<br>$$<br>然后通过矩阵乘积，我们得到：<br>$$<br>Xθ = \begin{bmatrix}<br>\ —\ (x^{(1)})^{T}θ \ — \ \<br>\ —\ (x^{(2)})^{T}θ \ — \ \<br>.\.\<br>\ —\ (x^{(m)})^{T}θ \ — \ \<br>\end{bmatrix} = \begin{bmatrix}<br>\ —\ θ^{T}(x^{(1)}) \ — \ \<br>\ —\ θ^{T}(x^{(2)}) \ — \ \<br>.\.\<br>\ —\ θ^{T}(x^{(m)}) \ — \ \<br>\end{bmatrix}<br>$$<br>在最后的等式中我们使用了如果$a\ b$ 是向量，那么$a^{T}b=b^{T}a$ 这一定理，所以我们可以直接计算 $θ^{T}x^{(i)}$ 的积来计算所有示例而仅仅只用一行代码。我奇怪的是，这么重要的事为什么不早点提到…明明上次作业就需要用的知识，害我自己苦苦推了好久…公式实现在后面的正则化的时候再 po 吧，除了正则化的时候多加了<strong>罚值</strong>外都是一样的。</p>
+<h3 id="Vectorizing-the-gradient"><a href="#Vectorizing-the-gradient" class="headerlink" title="Vectorizing the gradient"></a>Vectorizing the gradient</h3><p>非正则化逻辑回归成本的梯度是一个向量，其中 <em>$j^{th}$</em> 元素被定义为：<br>$$<br>\frac{∂J(θ)}{∂θ<em>{j}} = \frac{1}{m}\sum^{m}</em>{i=1}{(h_{θ}(x^{(i)})-y^{(i)})x^{(i)}<em>{j}}<br>$$<br>为了将此操作矢量化，我们先写出所有 $θ</em>{j}$ 的偏导数：<br>$$<br>\begin{equation}<br>\begin{aligned}<br>θ =\begin{bmatrix} \frac{∂J(θ)}{∂θ<em>{0}} \ \frac{∂J(θ)}{∂θ</em>{1}}\ .\.\ \frac{∂J(θ)}{∂θ<em>{n}} \end{bmatrix}<br>    &amp;= \begin{bmatrix}<br>    \sum</em>{i=1}^{m}{(h_{θ}(x^{(i)})-y^{(i)})x^{(i)}<em>{0}} \<br>    \sum</em>{i=1}^{m}{(h_{θ}(x^{(i)})-y^{(i)})x^{(i)}<em>{1}} \. \.\<br>    \sum</em>{i=1}^{m}{(h_{θ}(x^{(i)})-y^{(i)})x^{(i)}<em>{n}} \<br>    \end{bmatrix} \<br>&amp;=\frac{1}{m}\sum</em>{i=1}^{m}{(h_{θ}(x^{(i)})-y^{(i)})x^{(i)}} \<br>&amp;=\frac{1}{m}X^{T}(h_{θ}(x)-y)<br>\end{aligned}<br>\end{equation}<br>$$<br>然后再前面的公式中：<br>$$<br>h_{θ}(x) - y = \begin{bmatrix}<br>        h_{θ}(x^{(1)})-y^{(1)} \<br>        h_{2}(x^{(1)})-y^{(2)} \<br>        .\.\<br>        h_{θ}(x^{(m)})-y^{(m)}<br>        \end{bmatrix}<br>$$<br>注意 $x^{(i)}$ 是一个向量而 $(h_{θ}(x^{(i)}) - y^{(i)})$ 是一个标量，为了理解推导的最后一步，设 $β<em>{i} =(h</em>{θ}(x^{(i)}) - y^{(i)})$ ，并观察到：<br>$$<br>\sum_{i}x^i = \begin{bmatrix}<br>            \Big| \qquad \ \Big| \qquad \quad  \Big| \<br>            \quad x^{(1)} \quad x^{(2)} … x^{(m)}\<br>            \Big| \qquad \ \Big| \qquad \quad  \Big| \<br>            \end{bmatrix} \begin{bmatrix}<br>            β<em>{1}\<br>            β</em>{1}\<br>            .\.\<br>            β_{m}<br>            \end{bmatrix} = X^Tβ<br>$$<br>这个表达式可以让我们在没有任何循环的情况下计算所有的偏导数，通过它，我们就可以动手开始计算矢量化的方法来计算梯度。和成本函数一样，我等正则化的时候再一起把代码po出来。唉为什么不早点说这个推导阿…从第一周作业开始就要用到的东西…</p>
+<h3 id="Vectorizing-regularized-logistic-regression"><a href="#Vectorizing-regularized-logistic-regression" class="headerlink" title="Vectorizing regularized logistic regression"></a>Vectorizing regularized logistic regression</h3><p>有了前面的铺垫，我们终于可以开始正则化成本函数以及梯度了。我们将正则化添加到之前的逻辑回归中，成本函数就被定义为：<br>$$<br>J(θ) = \frac{1}{m}\sum^{m}<em>{i=1}{[-y^{(i)}log(h</em>{θ}(x^{(i)}))-(1-y^{(i)})log(1-h_{θ}(x^{(i)}))]}\ + \ \frac{λ}{2m}\sum_{j=1}^{n}{θ<em>{j}^2}<br>$$<br>相应的， $θ</em>{j}$ 的正则化逻辑回归成本的偏导数被定义为：<br>$$<br>\begin{equation}<br>\begin{aligned}<br>\frac{∂J(θ)}{∂θ<em>{0}} &amp;= \frac{1}{m}\sum^{m}</em>{i=1}{(h_{θ}(x^{(i)})-y^{(i)})x^{(i)}<em>{j}} \qquad \qquad \qquad \ \ for \ \ j=0      \<br>\frac{∂J(θ)}{∂θ</em>{j}} &amp;= \Big( \frac{1}{m}\sum^{m}<em>{i=1}{(h</em>{θ}(x^{(i)})-y^{(i)})x^{(i)}_{j}}\Big)+\frac{λ}{m}θ<em>j \qquad for \ \ j≥1<br>\end{aligned}<br>\end{equation}<br>$$<br>一定要注意，无论是成本函数还是梯度。**$θ</em>{0}$ 的那一项都不需要被正则化*<em> 。然后我们去 </em>lrCostFunction.m* 中实现它：</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[J, grad]</span> = <span class="title">lrCostFunction</span><span class="params">(theta, X, y, lambda)</span></span></span><br><span class="line"></span><br><span class="line">m = <span class="built_in">length</span>(y);</span><br><span class="line"></span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE=========================</span></span><br><span class="line">J = <span class="number">1</span>/m * (-y'*<span class="built_in">log</span>(sigmoid(X*theta)) - (<span class="number">1</span>-y)'*<span class="built_in">log</span>(<span class="number">1</span>-sigmoid(X*theta)))...</span><br><span class="line">    + lambda/(<span class="number">2</span>*m) * (sum(theta.^<span class="number">2</span>) - theta(<span class="number">1</span>).^<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">grad = <span class="number">1</span>/m * X' * (sigmoid(X*theta)-y);</span><br><span class="line">temp = theta;</span><br><span class="line">temp(<span class="number">1</span>) = <span class="number">0</span>;</span><br><span class="line">grad = grad + lambda/m*temp;</span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE=========================</span></span><br><span class="line"></span><br><span class="line">grad = grad(:);</span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<h2 id="One-vs-all-Classification"><a href="#One-vs-all-Classification" class="headerlink" title="One-vs-all Classification"></a>One-vs-all Classification</h2><p>在这部分中，我们通过训练多个正则化的逻辑回归分类器来实现一对多的分类，K个分类中的每一个类别都应有一个分类器。对于我们现在在做的这题手写数字识别来说 K=10，但我们的代码应该在无论K等于几的时候都能正常工作。</p>
+<p>在 <em>oneVsAll.m</em> 中完成代码，以便为每个类别训练一个分类器。这段函数应该返回一个 $Θ∈\mathbb{R}^{K\times(N+1)}$ ，其中每一行对应着一个类别的逻辑回归的参数，可以用 <em>for</em> 循环来分别训练可以每一个分类器。</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[all_theta]</span> = <span class="title">oneVsAll</span><span class="params">(X, y, num_labels, lambda)</span></span></span><br><span class="line"></span><br><span class="line">m = <span class="built_in">size</span>(X, <span class="number">1</span>);</span><br><span class="line">n = <span class="built_in">size</span>(X, <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">all_theta = <span class="built_in">zeros</span>(num_labels, n + <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">X = [<span class="built_in">ones</span>(m, <span class="number">1</span>) X];</span><br><span class="line"></span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE=========================</span></span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">1</span>:num_labels</span><br><span class="line">    initial_theta = <span class="built_in">zeros</span>(n+<span class="number">1</span>, <span class="number">1</span>);</span><br><span class="line">    options = optimset(<span class="string">'GradObj'</span>, <span class="string">'on'</span>, <span class="string">'MaxIter'</span>, <span class="number">50</span>);</span><br><span class="line">    [theta] = ...</span><br><span class="line">        fmincg(@(t)(lrCostFunction(t, X, (y==<span class="built_in">i</span>), lambda)), ...</span><br><span class="line">                initial_theta, options);</span><br><span class="line">    all_theta(<span class="built_in">i</span>,:) = theta;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE=========================</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p><em>fmincg( )</em> 是一个类似于之前提到的 <em>fminunc( )</em> 的函数，但处理大量参数时更有效。</p>
+<h3 id="One-vs-all-Prediction"><a href="#One-vs-all-Prediction" class="headerlink" title="One-vs-all Prediction"></a>One-vs-all Prediction</h3><p>在训练完所有分类后，现在可以利用它来预测给定图像所显示的数字。对于每个输入，使用训练后的逻辑回归分类器计算它属于每个类别的概率，并选择概率最高的那个类返回它的标签（1,2,…, K)。</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">p</span> = <span class="title">predictOneVsAll</span><span class="params">(all_theta, X)</span></span></span><br><span class="line"></span><br><span class="line">m = <span class="built_in">size</span>(X, <span class="number">1</span>);</span><br><span class="line">num_labels = <span class="built_in">size</span>(all_theta, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">p = <span class="built_in">zeros</span>(<span class="built_in">size</span>(X, <span class="number">1</span>), <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">X = [<span class="built_in">ones</span>(m, <span class="number">1</span>) X];</span><br><span class="line"></span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE=========================</span></span><br><span class="line">[~,<span class="built_in">i</span>] = <span class="built_in">max</span>(sigmoid(X * all_theta'), [], <span class="number">2</span>);</span><br><span class="line">p = <span class="built_in">i</span>;</span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE=========================</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>备注一下 <em>max( )</em> 的这种用法，<em>max(A, [ ], 2)</em> 可以用来获得每一行的最大值，而 <em>max(A, [ ], 2)</em> 则获得每一列的最大值。</p>
+<p>如果一切正确，可以看到我们通过训练得到的分类器正确率约有 95%，还是非常不错的~</p>
+<hr>
+<h1 id="Neural-Network"><a href="#Neural-Network" class="headerlink" title="Neural Network"></a>Neural Network</h1><p>在前面一部分中，我们实现了多类的逻辑回归来识别手写数字。然而逻辑回归不能形成更加复杂的假设(<em>hypotheses</em> )，因为它只是一个线性分类器。</p>
+<p>在这一部分，我们将要实现一个神经网络，使用与之前相同的训练集来识别手写数字。用神经网络可以表示更复杂的非线性模型。这周的作业较简单因为我们可以直接使用他们已经训练好的神经网络参数，我们要做的仅仅是用他们给的权重来实施前馈传播(<em>feedforward propagation</em>)算法进行预测。噢，权重和参数在这儿是同一种东西不同翻译而已。</p>
+<h2 id="Model-representation"><a href="#Model-representation" class="headerlink" title="Model representation"></a>Model representation</h2><p>我们的神经网络如下图所示。它有3层，分别是输入层、隐藏层和输出层各一层。回忆一下我们输入是图像的像素值，由于图像大小为 20×20，因此可以得到400个输入层单位，不包括总是加1的偏置单位(<em>bias unit</em>) 。</p>
+<p>作业已经提供了一组由他们训练的参数（$Θ^{(1)}$ , $Θ^{(2)}$）存储在 <em>ex3weights.m</em> 中，<em>ex3nn.m</em> 还会好人做到底帮我们顺便加载了。这些参数的尺寸适用于第二层有25个单元和10个输出单元的神经网络。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">% Load the weights into variables Theta1 and Theta2</span><br><span class="line">load(&apos;ex3weights.mat&apos;);</span><br><span class="line"></span><br><span class="line">% The matrices Theta1 and Theta2 will now be in your Octave environment </span><br><span class="line">% Theta1 has size 25 x 401 </span><br><span class="line">% Theta2 has size 10 x 26</span><br></pre></td></tr></table></figure>
+<p><img src="http://p7jn6eeff.bkt.clouddn.com/ML/ex3/2.png" alt=""></p>
+<h2 id="Feedforward-Propagation-and-Prediction"><a href="#Feedforward-Propagation-and-Prediction" class="headerlink" title="Feedforward Propagation and Prediction"></a>Feedforward Propagation and Prediction</h2><p>现在就开始实现神经网络的前馈传播吧，完成 <em>predict.m</em> 并返回神经网络的预测值。</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">p</span> = <span class="title">predict</span><span class="params">(Theta1, Theta2, X)</span></span></span><br><span class="line"></span><br><span class="line">m = <span class="built_in">size</span>(X, <span class="number">1</span>);</span><br><span class="line">num_labels = <span class="built_in">size</span>(Theta2, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE=========================</span></span><br><span class="line">X = [<span class="built_in">ones</span>(m,<span class="number">1</span>) X];</span><br><span class="line">layer2 = sigmoid(X*Theta1');</span><br><span class="line">layer2 = [<span class="built_in">ones</span>(<span class="built_in">size</span>(layer2,<span class="number">1</span>),<span class="number">1</span>) layer2];</span><br><span class="line"></span><br><span class="line">layer3 = sigmoid(layer2*Theta2');</span><br><span class="line">[~,p] = <span class="built_in">max</span>(layer3, [], <span class="number">2</span>);</span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE=========================</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>最后程序会一次显示一个手写数字图像，并利用我们的神经网络算法来预测该数字。我看了一部分的识别超好玩哈哈哈哈哈哈哈</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/23/机器学习：编程作业（二）/" rel="next" title="机器学习：编程作业（二）">
+                <i class="fa fa-chevron-left"></i> 机器学习：编程作业（二）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/07/机器学习：编程作业（四）/" rel="prev" title="机器学习：编程作业（四）">
+                机器学习：编程作业（四） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.png" alt="0ran9e">
+            
+              <p class="site-author-name" itemprop="name">0ran9e</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:971109888@qq.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://weibo.com/3190492602" target="_blank" title="微博"><i class="fa fa-fw fa-weibo"></i>微博</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Multi-class-Classification"><span class="nav-number">1.</span> <span class="nav-text">Multi-class Classification</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Dataset"><span class="nav-number">1.1.</span> <span class="nav-text">Dataset</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Visualizing-the-data"><span class="nav-number">1.2.</span> <span class="nav-text">Visualizing the data</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vectorizing-Logistic-Regression"><span class="nav-number">1.3.</span> <span class="nav-text">Vectorizing Logistic Regression</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Vectorizing-the-cost-function"><span class="nav-number">1.3.1.</span> <span class="nav-text">Vectorizing the cost function</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Vectorizing-the-gradient"><span class="nav-number">1.3.2.</span> <span class="nav-text">Vectorizing the gradient</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Vectorizing-regularized-logistic-regression"><span class="nav-number">1.3.3.</span> <span class="nav-text">Vectorizing regularized logistic regression</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#One-vs-all-Classification"><span class="nav-number">1.4.</span> <span class="nav-text">One-vs-all Classification</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#One-vs-all-Prediction"><span class="nav-number">1.4.1.</span> <span class="nav-text">One-vs-all Prediction</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Neural-Network"><span class="nav-number">2.</span> <span class="nav-text">Neural Network</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Model-representation"><span class="nav-number">2.1.</span> <span class="nav-text">Model representation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Feedforward-Propagation-and-Prediction"><span class="nav-number">2.2.</span> <span class="nav-text">Feedforward Propagation and Prediction</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">0ran9e</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.2.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.2.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.2.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.2.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.2.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.2.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.2.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/npm/mathjax@2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
+  
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

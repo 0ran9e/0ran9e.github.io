@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.2.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next-me.png?v=6.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next-me.png?v=6.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next-me.png?v=6.2.0">
+
+
+  <link rel="mask-icon" href="/images/logo-me.svg?v=6.2.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="这是关于在Coursera上的Andrew Ng的机器学习的课后习题笔记，将每周完成的作业记录下来，加深印象并方便以后的复习用。 Simple Octave/MATLAB function完成warmUpExercise.m，使其返回一个5×5的单位矩阵。在之前的课程中提到过，eye(n)函数可以返回一个n×n的矩阵，所以解为： 1A = eye(5); 输出结果为 123456ans =">
+<meta name="keywords" content="机器学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器学习：编程作业（一）">
+<meta property="og:url" content="http://0ran9e.com/2018/04/18/机器学习：编程作业（一）/index.html">
+<meta property="og:site_name" content="0ran9e&#39;s Blog">
+<meta property="og:description" content="这是关于在Coursera上的Andrew Ng的机器学习的课后习题笔记，将每周完成的作业记录下来，加深印象并方便以后的复习用。 Simple Octave/MATLAB function完成warmUpExercise.m，使其返回一个5×5的单位矩阵。在之前的课程中提到过，eye(n)函数可以返回一个n×n的矩阵，所以解为： 1A = eye(5); 输出结果为 123456ans =">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://p7jn6eeff.bkt.clouddn.com/ML/ex1/1.png">
+<meta property="og:image" content="http://p7jn6eeff.bkt.clouddn.com/ML/ex1/2.png">
+<meta property="og:image" content="http://p7jn6eeff.bkt.clouddn.com/ML/ex1/3.png">
+<meta property="og:image" content="http://p7jn6eeff.bkt.clouddn.com/ML/ex1/4.png">
+<meta property="og:image" content="http://p7jn6eeff.bkt.clouddn.com/ML/ex1/5.png">
+<meta property="og:updated_time" content="2018-04-27T13:17:42.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="机器学习：编程作业（一）">
+<meta name="twitter:description" content="这是关于在Coursera上的Andrew Ng的机器学习的课后习题笔记，将每周完成的作业记录下来，加深印象并方便以后的复习用。 Simple Octave/MATLAB function完成warmUpExercise.m，使其返回一个5×5的单位矩阵。在之前的课程中提到过，eye(n)函数可以返回一个n×n的矩阵，所以解为： 1A = eye(5); 输出结果为 123456ans =">
+<meta name="twitter:image" content="http://p7jn6eeff.bkt.clouddn.com/ML/ex1/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://0ran9e.com/2018/04/18/机器学习：编程作业（一）/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>机器学习：编程作业（一） | 0ran9e's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">0ran9e's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">心之所向 素履以往</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://0ran9e.com/2018/04/18/机器学习：编程作业（一）/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="0ran9e">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="0ran9e's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">机器学习：编程作业（一）
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-04-18 00:13:40" itemprop="dateCreated datePublished" datetime="2018-04-18T00:13:40+08:00">2018-04-18</time>
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/机器学习/" itemprop="url" rel="index"><span itemprop="name">机器学习</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　</p>
+<p>这是关于在Coursera上的Andrew Ng的机器学习的课后习题笔记，将每周完成的作业记录下来，加深印象并方便以后的复习用。</p>
+<h1 id="Simple-Octave-MATLAB-function"><a href="#Simple-Octave-MATLAB-function" class="headerlink" title="Simple Octave/MATLAB function"></a>Simple Octave/MATLAB function</h1><p>完成<em>warmUpExercise.m</em>，使其返回一个5×5的单位矩阵。在之前的课程中提到过，<em>eye(n)</em>函数可以返回一个n×n的矩阵，所以解为：</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">A = <span class="built_in">eye</span>(<span class="number">5</span>);</span><br></pre></td></tr></table></figure>
+<p>输出结果为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ans = </span><br><span class="line">	1  0  0  0  0</span><br><span class="line">	0  1  0  0  0</span><br><span class="line">	0  0  1  0  0</span><br><span class="line">	0  0  0  1  0</span><br><span class="line">	0  0  0  0  1</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h2 id="Submitting-Solutions"><a href="#Submitting-Solutions" class="headerlink" title="Submitting Solutions"></a>Submitting Solutions</h2><p>这题没啥好说的，关联好Coursera的账后后，在MATLAB命令行中输入<em>submit</em>就行了</p>
+<hr>
+<h1 id="Linear-regression-with-one-variable"><a href="#Linear-regression-with-one-variable" class="headerlink" title="Linear regression with one variable"></a>Linear regression with one variable</h1><p>假设我们是个连锁餐厅的老板，现在要开一家新的分店。根据拥有的不同城市的人口和对应的利润，来预测下一家店开在哪儿收益最大。</p>
+<p>文件<em>ex1data1.txt</em>就是关于我们这个线性回归问题的数据集，第一列是某城市的人口，第二列是对应的城市利润，负数代表亏损。</p>
+<h2 id="Plotting-the-Data"><a href="#Plotting-the-Data" class="headerlink" title="Plotting the Data"></a>Plotting the Data</h2><p>在开始一项任务之前，把它图形化是一个很棒的选择。对于这个数据集，因为只有两个属性，所以我们可以用散点图来显示数据。</p>
+<p>作业已经帮你把数据加载好了</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">data = load(<span class="string">'ex1data1.txt'</span>)	</span><br><span class="line">X = data(:, <span class="number">1</span>); y = data(:, <span class="number">2</span>);</span><br><span class="line">m = <span class="built_in">length</span>(y);</span><br></pre></td></tr></table></figure>
+<p><em>plotData</em>函数会将它绘制出来，我们需要完成<em>plotData.m</em>，这题在作业的文档中已经给出解答了</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">plot</span>(x, y, <span class="string">'rx'</span>, <span class="string">'MarkSize'</span>, <span class="number">10</span>);</span><br><span class="line">ylabel(<span class="string">'Profit in $10,1000s'</span>);</span><br><span class="line">xlabel(<span class="string">'Population of City in 10,1000s'</span>);</span><br></pre></td></tr></table></figure>
+<p>然后运行程序，就可以看到这样的散点图</p>
+<p><img src="http://p7jn6eeff.bkt.clouddn.com/ML/ex1/1.png" alt=""></p>
+<h2 id="Gradient-Descent"><a href="#Gradient-Descent" class="headerlink" title="Gradient Descent"></a>Gradient Descent</h2><p>在这一部分，我们要利用梯度下降算法，来得到适合我们数据集的线性回归的参数<em>θ</em></p>
+<h3 id="Update-Equations"><a href="#Update-Equations" class="headerlink" title="Update Equations"></a>Update Equations</h3><p>线性回归的目标是最小化成本函数：<br>$$<br>\frac{1}{2m}\sum_{i=1}^{m}{h_{θ}({x}^{(i)}-{y}^{(i)})}^{2}<br>$$<br>在线性模型中，假设$h_{θ}$值为：<br>$$<br>h{θ} = θ^{T}x = θ<em>{0} + θ</em>{1}<br>$$<br>记得$θ<em>{j}$才是这个模型的参数，通过调整$θ</em>{j}$的值来最小化成本函数。其中一个方法就是梯度下降算法，在梯度下降算法中，每次迭代都会更新$θ<em>{j}$的值：<br>$$<br>θ</em>{j} := θ<em>{j} - α\frac{1}{m}\sum</em>{i=1}^{m}(h_{θ}(x^{(i)}) - y^{(i)})x_{j}^{(i)}<br>$$<br>在梯度下降算法的每个步骤中，参数$θ_{j}$就更接近实现最低成本J(θ)的最优值。</p>
+<h3 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation"></a>Implementation</h3><p>在ex1.m中，已经建立了线性回归的数据，在下面几行代码中，我们为矩阵X的第一列添加了一列1，以符合成本函数中$θ_{0}$项的系数1。</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">X = [<span class="built_in">ones</span>(m, <span class="number">1</span>), data(:,<span class="number">1</span>)];</span><br><span class="line">theta = <span class="built_in">zeros</span>(<span class="number">2</span>,<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">iterations = <span class="number">1500</span>;</span><br><span class="line">alpha = <span class="number">0.01</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="Computing-the-cost-J-θ"><a href="#Computing-the-cost-J-θ" class="headerlink" title="Computing the cost  J(θ)"></a>Computing the cost  <em>J(θ)</em></h3><p>当执行梯度下降算法使成本函数 <em>J(θ)</em> 最小化时，计算成本来监视收敛是很有用的。</p>
+<p>完成文件 <em>computeCost.m</em> 中计算 <em>J(θ)</em> 的函数，需要注意的是——<strong>X和y不是标量，而是代表着训练集的矩阵</strong>。当我们做完这题后，ex1.m 将会用初始化为零的 <em>θ</em> 来计算成本函数。</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">J</span> = <span class="title">computeCost</span><span class="params">(X, y, theta)</span></span></span><br><span class="line"></span><br><span class="line">m = <span class="built_in">length</span>(y);</span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE=========================</span></span><br><span class="line">predictions = X * theta;</span><br><span class="line">sqrErrors = (predictions-y).^<span class="number">2</span>;</span><br><span class="line">J = <span class="number">1</span>/(<span class="number">2</span>*m) sum(sqrErrors);</span><br><span class="line"><span class="comment">% or J = sum((X*theta-y).^2)/(2*length(y));</span></span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE=========================</span></span><br></pre></td></tr></table></figure>
+<h3 id="Gradient-descent"><a href="#Gradient-descent" class="headerlink" title="Gradient descent"></a>Gradient descent</h3><p>接下来我们就要在文件 <em>gradientDescent.m</em> 中实现梯度下降算法了，循环结构已经为我们写好了，需要做的只需要在每个迭代中更新<em>θ</em>，注意 $θ<em>{j}$ 的值是<strong>同步更新</strong>（<em>simultaneously update</em>）的，简单地说就是将每一个计算的 $θ</em>{j}$ 存入临时变量，最后再一起赋值回去。还有记住我们是通过改变向量 <em>θ</em> 而不是X和y来最小化 <em>J(θ)</em> 。</p>
+<p>检验梯度下降算法的一个方法是查看 <em>J(θ)</em> 的值是否随着每一个迭代都下降，如果正确的话 <em>J(θ)</em> 的值不会下降并且在算法结束时应该收敛于一个稳定值。</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[theta, J_history]</span> = <span class="title">gradientDescent</span><span class="params">(X, y, alpha, num_iters)</span></span></span><br><span class="line"></span><br><span class="line">m = <span class="built_in">length</span>(y);</span><br><span class="line">J_history = <span class="built_in">zeros</span>(num_iters, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> iter = <span class="number">1</span>:num_iters</span><br><span class="line"></span><br><span class="line">	<span class="comment">% =========================YOUR CODE HERE=========================</span></span><br><span class="line">	theta = theta - alpha/m * X' * (X*theta-y);</span><br><span class="line">	<span class="comment">% =========================YOUR CODE HERE=========================</span></span><br><span class="line"></span><br><span class="line">	J_history(iter) = computeCost(X, y, theta);</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>这题我因为太笨真的想了非常非常非常久！最后反应过来如果用<strong>矢量化</strong>（<em>vectorized</em>） 来实现而不是用传统的循环会简单非常多。说实话，通过这题也是第一次感受到了矩阵的强大。</p>
+<p>完成后ex1.m将会用我们最后得到的 <em>θ</em> 画出一条匹配的直线</p>
+<p><img src="http://p7jn6eeff.bkt.clouddn.com/ML/ex1/2.png" alt=""></p>
+<h2 id="Debugging"><a href="#Debugging" class="headerlink" title="Debugging"></a>Debugging</h2><p>关于MATLAB的用法，不在这里赘述了有需要再看文档吧</p>
+<h2 id="Visualizing-J-θ"><a href="#Visualizing-J-θ" class="headerlink" title="Visualizing  J(θ)"></a>Visualizing  <em>J(θ)</em></h2><p>为了更好的理解成本函数 <em>J(θ)</em> ，现在在关于 $θ<em>{0}$ 和 *$θ</em>{1}$* 的二维网格上画出成本值。我们不需要写任何代码，只需要理解是如何实现这一功能的就ok了。</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">fprintf(<span class="string">'Visualizing J(theta_0, theta_1)...\n'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">% 计算J的网格</span></span><br><span class="line">theta0_vals = <span class="built_in">linspace</span>(<span class="number">-10</span>, <span class="number">10</span>, <span class="number">100</span>);</span><br><span class="line">theta1_vals = <span class="built_in">linspace</span>(<span class="number">-1</span>, <span class="number">4</span>, <span class="number">100</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">% 用0初始化J_vals</span></span><br><span class="line">J_vals = <span class="built_in">zeros</span>(<span class="built_in">length</span>(theta0_vals), <span class="built_in">length</span>(theta1_vals));</span><br><span class="line"></span><br><span class="line"><span class="comment">% 计算并填满J_vals</span></span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">1</span>:<span class="built_in">length</span>(theta0_vals)</span><br><span class="line">	<span class="keyword">for</span> <span class="built_in">j</span> = <span class="number">1</span>:<span class="built_in">length</span>(theta1_vals)</span><br><span class="line">		t = [theta0_vals(<span class="built_in">i</span>); theta1_vals(<span class="built_in">j</span>)];</span><br><span class="line">		J_vals(<span class="built_in">i</span>,<span class="built_in">j</span>) = computeCost(X, y, t);</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">%因为surf命令的工作方式，我们需要在调用surf之前转置J_vals否则图像会翻转</span></span><br><span class="line">J_vals = J_vals';</span><br><span class="line"><span class="comment">%表面图</span></span><br><span class="line"><span class="built_in">figure</span>;</span><br><span class="line">surf(theta0_vals, theta1_vals, J_vals)</span><br><span class="line">xlabel(<span class="string">'\theta_0'</span>); ylabel(<span class="string">'\theta_1'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">%等高线图</span></span><br><span class="line"><span class="built_in">figure</span>;</span><br><span class="line">contour(theta0_vals, theta1_vals, J_vals, <span class="built_in">logspace</span>(<span class="number">-2</span>, <span class="number">3</span>, <span class="number">20</span>))</span><br><span class="line">xlabel(<span class="string">'\theta_0'</span>); ylabel(<span class="string">'\theta_1'</span>);</span><br><span class="line"><span class="built_in">hold</span> on;</span><br><span class="line"><span class="built_in">plot</span>(theta(<span class="number">1</span>), theta(<span class="number">2</span>), <span class="string">'rx'</span>, <span class="string">'MarkerSize'</span>, <span class="number">10</span>, <span class="string">'LineWidth'</span>, <span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+<p><img src="http://p7jn6eeff.bkt.clouddn.com/ML/ex1/3.png" alt=""></p>
+<p><img src="http://p7jn6eeff.bkt.clouddn.com/ML/ex1/4.png" alt=""></p>
+<hr>
+<h1 id="Linear-regression-with-multiple-variables"><a href="#Linear-regression-with-multiple-variables" class="headerlink" title="Linear regression with multiple variables"></a>Linear regression with multiple variables</h1><p>在这一部分，我们将要完成多变量的线性回归用来预测房屋的价格。假设你想卖掉你的房子，并且想知道能卖出个多少的好价钱，第一步就是收集最近房屋售卖的信息并建立出一个房价的模型。</p>
+<p>文件ex1data2.txt是一份关于在Portland，Oregon的房价训练集。第一列是房子的大小，第二列是卧室的数量，第三列是房子的价格。</p>
+<h2 id="Feature-Normalization"><a href="#Feature-Normalization" class="headerlink" title="Feature Normalization"></a>Feature Normalization</h2><p>首先我们可以观察数据集的一些值。可以发现房子的大小大约是卧室数量的1000倍，当特征的值差异大时，首先采用<strong>特征缩放</strong>（<em>Feature Normalization</em>）可以使梯度下降更快的收敛。</p>
+<p>特征缩放的实现很简单，简单来说，就是将数据集中的每个元素减去各自特征的<strong>平均值</strong>，再除以各自的<strong>标准偏差</strong>（<em>standard deviations</em>）。</p>
+<p>我们需要用到MATLAB中的两个函数，<em>mean( )</em>求平均值，std( )求标准偏差。给这两个函数一个矩阵时，他们会返回一个行为1的向量，依次对应着矩阵中每一列的平均值或标准偏差。</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span><span class="params">[X_norm, mu, sigma]</span> = <span class="title">featureNormalize</span><span class="params">(X)</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE========================</span></span><br><span class="line">mu = <span class="built_in">mean</span>(X);</span><br><span class="line">sigma = std(X);</span><br><span class="line">X_norm = (X-mu)./sigma;</span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE========================</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>没想到MATLAB居然那么聪明…矩阵减一个相同列的向量时，可以自动将矩阵的每一行都同时减去该向量…点运算也是同理…我还傻乎乎的去把它们全转换成同维度的花了很多时间…</p>
+<p>还有非常重要的一点，要记得存储用来缩放的平均值与标准偏差。因为假设我们又要预测一个新的房屋的价格，一定要记得<strong>用这两个值，先将其数据做特征缩放</strong>，否则预测的值将会是错误的。</p>
+<h2 id="Gradient-Descent-1"><a href="#Gradient-Descent-1" class="headerlink" title="Gradient Descent"></a>Gradient Descent</h2><p>我们之前已经完成了单变量的的梯度下降算法，在这题中唯一不同的就是特征的数量。因为我们在单变量的梯度下降算法时矢量化的想法，因此在多变量的情况下它也能完美的适用，这又是矩阵的另一优势</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[theta, J_history]</span> = <span class="title">gradientDescentMulti</span><span class="params">(X, y, theta, alpha, num_iters)</span></span></span><br><span class="line"></span><br><span class="line">m = <span class="built_in">length</span>(y);</span><br><span class="line">J_history = <span class="built_in">zeros</span>(num_iters, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> iter = <span class="number">1</span>:num_iters</span><br><span class="line"></span><br><span class="line">	<span class="comment">% =========================YOUR CODE HERE========================</span></span><br><span class="line">	theta = theta - alpha/m * X' * (X*theta-y);</span><br><span class="line">	<span class="comment">% =========================YOUR CODE HERE========================</span></span><br><span class="line"></span><br><span class="line">	J_history(iter) = computeCostMulti(X, y, theta);</span><br><span class="line">	</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>在多变量的情况下，我们可以将成本函数写成矢量化的形式<br>$$<br>J(θ) = \frac{1}{2m}(Xθ-\vec{y})^{T}(Xθ-\vec{y})<br>$$<br>因此我们可以这么做多变量的成本函数</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">J</span> = <span class="title">computeCostMulti</span><span class="params">(X, y, theta)</span></span></span><br><span class="line"></span><br><span class="line">m = <span class="built_in">length</span>(y);</span><br><span class="line"></span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE========================</span></span><br><span class="line">J = <span class="number">1</span>/(<span class="number">2</span>*m) * (X*theta-y)' * (X*theta-y);</span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE========================</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p><img src="http://p7jn6eeff.bkt.clouddn.com/ML/ex1/5.png" alt=""></p>
+<h2 id="Selecting-learning-rates"><a href="#Selecting-learning-rates" class="headerlink" title="Selecting learning rates"></a>Selecting learning rates</h2><p>这个自己捣鼓着玩儿吧，只要注意的在之前课程中说到的：合适的学习速率可以加快收敛速度，学习速率太小会只会使收敛速度降低，而过大则可能导致梯度下降失败。Andrew Ng的建议是每次速率取三倍之前的值，比如 0.3, 0.1, 0.03, 0.01等。</p>
+<h2 id="Normal-Equations"><a href="#Normal-Equations" class="headerlink" title="Normal Equations"></a>Normal Equations</h2><p>在课程中我们已经看到了递归方程<br>$$<br>θ = （X^{T}X)^{-1}X^{T}\vec{y}<br>$$<br>正规方程可以不需要递归与学习速率直接计算出最小化 <em>J(θ)</em> 的 <em>θ</em> ，而且也不需要做特征缩放的步骤。缺点是当特征数量偏大时，正规方程的速度比梯度下降算法更慢，所以我们一般取10,000为分界来选择梯度下降算法还是正规方程。</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[theta]</span> = <span class="title">normalEqn</span><span class="params">(X, y)</span></span></span><br><span class="line"></span><br><span class="line">theta = zeors(<span class="built_in">size</span>(X, <span class="number">2</span>), <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE========================</span></span><br><span class="line">theta = pinv(X'*X) * X' *y;</span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE========================</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>最后还有个题目是让你用梯度下降算法得出的 <em>θ</em> 与正规方程得出的 <em>θ</em> ，来计算面积为1650平方英尺、3个卧室的一个房子的价格。如果不出意外的话，两种方法得出的结果应该是一样的</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">% 用梯度下降算法的结果</span></span><br><span class="line">x1 = (<span class="number">1650</span>-mu(<span class="number">1</span>)) / sigma(<span class="number">1</span>);</span><br><span class="line">x2 = (<span class="number">3</span>-mu(<span class="number">2</span>)) / sigma(<span class="number">2</span>);</span><br><span class="line">price = [<span class="number">1</span>, x1, x2] * theta;</span><br><span class="line"></span><br><span class="line"><span class="comment">% 用正规方程的结果</span></span><br><span class="line">price = [<span class="number">1</span>, <span class="number">1650</span>, <span class="number">3</span>] * theta;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Predicted price of a 1650 sq-ft, 3 br house(using gradient descent):</span><br><span class="line">$293081.464335</span><br><span class="line">Predicted price of a 1650 sq-ft, 3 br house(using normal equations):</span><br><span class="line">$293081.464335</span><br></pre></td></tr></table></figure>
+<p>请一定要记得对用梯度下降算法的数据做特征缩放，当时就是一下子忘了所以两个房子的价格一直对不上…</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/23/机器学习：编程作业（二）/" rel="prev" title="机器学习：编程作业（二）">
+                机器学习：编程作业（二） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.png" alt="0ran9e">
+            
+              <p class="site-author-name" itemprop="name">0ran9e</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:971109888@qq.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://weibo.com/3190492602" target="_blank" title="微博"><i class="fa fa-fw fa-weibo"></i>微博</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Simple-Octave-MATLAB-function"><span class="nav-number">1.</span> <span class="nav-text">Simple Octave/MATLAB function</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Submitting-Solutions"><span class="nav-number">1.1.</span> <span class="nav-text">Submitting Solutions</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Linear-regression-with-one-variable"><span class="nav-number">2.</span> <span class="nav-text">Linear regression with one variable</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Plotting-the-Data"><span class="nav-number">2.1.</span> <span class="nav-text">Plotting the Data</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Gradient-Descent"><span class="nav-number">2.2.</span> <span class="nav-text">Gradient Descent</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Update-Equations"><span class="nav-number">2.2.1.</span> <span class="nav-text">Update Equations</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Implementation"><span class="nav-number">2.2.2.</span> <span class="nav-text">Implementation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Computing-the-cost-J-θ"><span class="nav-number">2.2.3.</span> <span class="nav-text">Computing the cost  J(θ)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Gradient-descent"><span class="nav-number">2.2.4.</span> <span class="nav-text">Gradient descent</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Debugging"><span class="nav-number">2.3.</span> <span class="nav-text">Debugging</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Visualizing-J-θ"><span class="nav-number">2.4.</span> <span class="nav-text">Visualizing  J(θ)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Linear-regression-with-multiple-variables"><span class="nav-number">3.</span> <span class="nav-text">Linear regression with multiple variables</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Feature-Normalization"><span class="nav-number">3.1.</span> <span class="nav-text">Feature Normalization</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Gradient-Descent-1"><span class="nav-number">3.2.</span> <span class="nav-text">Gradient Descent</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Selecting-learning-rates"><span class="nav-number">3.3.</span> <span class="nav-text">Selecting learning rates</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Normal-Equations"><span class="nav-number">3.4.</span> <span class="nav-text">Normal Equations</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">0ran9e</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.2.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.2.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.2.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.2.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.2.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.2.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.2.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/npm/mathjax@2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
+  
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
