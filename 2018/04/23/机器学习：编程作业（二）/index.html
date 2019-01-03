@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.2.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next-me.png?v=6.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next-me.png?v=6.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next-me.png?v=6.2.0">
+
+
+  <link rel="mask-icon" href="/images/logo-me.svg?v=6.2.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="这一章的练习主要是逻辑回归的应用，以及防止 过拟合 的正规化的逻辑回归。 Logistic Regression假设你是大学部门的管理人员，现在你想根据申请者的两门科目的成绩来确定他的录取机会。现在你手上有历史申请者的数据集，在数据集中的每个人都有他的两门科目的成绩以及是否录取的信息。 所以现在的任务是建立一个逻辑分类模型，根据两门考试的成绩估计申请者的录取概率。 Visualizing the">
+<meta name="keywords" content="机器学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器学习：编程作业（二）">
+<meta property="og:url" content="http://0ran9e.com/2018/04/23/机器学习：编程作业（二）/index.html">
+<meta property="og:site_name" content="0ran9e&#39;s Blog">
+<meta property="og:description" content="这一章的练习主要是逻辑回归的应用，以及防止 过拟合 的正规化的逻辑回归。 Logistic Regression假设你是大学部门的管理人员，现在你想根据申请者的两门科目的成绩来确定他的录取机会。现在你手上有历史申请者的数据集，在数据集中的每个人都有他的两门科目的成绩以及是否录取的信息。 所以现在的任务是建立一个逻辑分类模型，根据两门考试的成绩估计申请者的录取概率。 Visualizing the">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://p7jn6eeff.bkt.clouddn.com/ML/ex2/1.png">
+<meta property="og:image" content="http://p7jn6eeff.bkt.clouddn.com/ML/ex2/2.png">
+<meta property="og:image" content="http://p7jn6eeff.bkt.clouddn.com/ML/ex2/3.png">
+<meta property="og:image" content="http://p7jn6eeff.bkt.clouddn.com/ML/ex2/4.png">
+<meta property="og:image" content="http://p7jn6eeff.bkt.clouddn.com/ML/ex2/5.png">
+<meta property="og:image" content="http://p7jn6eeff.bkt.clouddn.com/ML/ex2/6.png">
+<meta property="og:updated_time" content="2018-04-29T16:12:50.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="机器学习：编程作业（二）">
+<meta name="twitter:description" content="这一章的练习主要是逻辑回归的应用，以及防止 过拟合 的正规化的逻辑回归。 Logistic Regression假设你是大学部门的管理人员，现在你想根据申请者的两门科目的成绩来确定他的录取机会。现在你手上有历史申请者的数据集，在数据集中的每个人都有他的两门科目的成绩以及是否录取的信息。 所以现在的任务是建立一个逻辑分类模型，根据两门考试的成绩估计申请者的录取概率。 Visualizing the">
+<meta name="twitter:image" content="http://p7jn6eeff.bkt.clouddn.com/ML/ex2/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://0ran9e.com/2018/04/23/机器学习：编程作业（二）/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>机器学习：编程作业（二） | 0ran9e's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">0ran9e's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">心之所向 素履以往</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://0ran9e.com/2018/04/23/机器学习：编程作业（二）/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="0ran9e">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="0ran9e's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">机器学习：编程作业（二）
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-04-23 19:43:46" itemprop="dateCreated datePublished" datetime="2018-04-23T19:43:46+08:00">2018-04-23</time>
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/机器学习/" itemprop="url" rel="index"><span itemprop="name">机器学习</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这一章的练习主要是逻辑回归的应用，以及防止 <em>过拟合</em> 的正规化的逻辑回归。</p>
+<h1 id="Logistic-Regression"><a href="#Logistic-Regression" class="headerlink" title="Logistic Regression"></a>Logistic Regression</h1><p>假设你是大学部门的管理人员，现在你想根据申请者的两门科目的成绩来确定他的录取机会。现在你手上有历史申请者的数据集，在数据集中的每个人都有他的两门科目的成绩以及是否录取的信息。</p>
+<p>所以现在的任务是建立一个逻辑分类模型，根据两门考试的成绩估计申请者的录取概率。</p>
+<h2 id="Visualizing-the-data"><a href="#Visualizing-the-data" class="headerlink" title="Visualizing the data"></a>Visualizing the data</h2><p>在开始应用任何学习算法之前，尽可能地将数据可视化。这题在ex2.m中调用函数plotData( )来画出图像，因为对MATLAB不熟，所以我就直接参考了作业文档中的代码：</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">plotData</span><span class="params">(X, y)</span></span></span><br><span class="line"></span><br><span class="line"><span class="built_in">figure</span>; <span class="built_in">hold</span> on;</span><br><span class="line"></span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE=========================</span></span><br><span class="line">pos = <span class="built_in">find</span>(y==<span class="number">1</span>); neg = <span class="built_in">find</span>(y==<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">plot</span>(X(pos,<span class="number">1</span>), X(pos,<span class="number">2</span>), <span class="string">'k+'</span>, <span class="string">'LineWidth'</span>, <span class="number">2</span>, <span class="string">'MarkerSize'</span>, <span class="number">7</span>);</span><br><span class="line"><span class="built_in">plot</span>(X(neg,<span class="number">1</span>), X(neg,<span class="number">2</span>), <span class="string">'ko'</span>, <span class="string">'MarkerFaceColor'</span>, <span class="string">'y'</span>, <span class="string">'MarkerSize'</span>, <span class="number">7</span>);</span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE=========================</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">hold</span> off;</span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<p><img src="http://p7jn6eeff.bkt.clouddn.com/ML/ex2/1.png" alt=""></p>
+<p>如图所示，两个坐标分别是两门考试的分数，申请的通过用不同类型的标记来显示。</p>
+<p>作为一个MATLAB萌新，可以记一下 <em>find( )</em> 函数的用法。还有 <em>plot( )</em> 函数新出现的几个参数，比如 <em>‘k+’</em> 和 <em>‘ko’</em> ，其中 <em>‘k’</em> 表示黑色，<em>‘+’</em> 和 <em>‘o’</em> 分别表示样式是 <em>十字形</em>  和 <em>圆形</em> 。 <em>‘MarkerFaceColor’</em> 和跟在后面的 <em>‘y’</em> 表示的是标记填充颜色为黄色，与MarkerFaceColor所对应的是 <em>MarkerEdgeColor</em> ，即边框颜色。</p>
+<h2 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation"></a>Implementation</h2><h3 id="Warmup-exercise：sigmoid-function"><a href="#Warmup-exercise：sigmoid-function" class="headerlink" title="Warmup exercise：sigmoid function"></a>Warmup exercise：sigmoid function</h3><p>在开始解出实际的成本函数之前，回忆一下逻辑回归的假设的定义为：<br>$$<br>h_{θ}(x) =  g(θ^{T}x)<br>$$<br>函数g是 <strong>sigmoid函数</strong>，它的定义为：<br>$$<br>g(z) = \frac{1}{1+e^{-z}}<br>$$<br>显而易见的是这个函数在后面将会一直被用到，所以我们第一步就是现在 <em>sigmoid.m</em> 中实现它。完成后可以自己调用 sigmoid(x) 来测试一下，对于一个大的正数，sigmoid应该趋近于1，而对于一个大的负数，sigmoid应该趋近于0。当x为0时，sigmoid的值为0.5。你的代码也应该支持向量与矩阵，对于矩阵，你的函数应该在每个元素上执行sigmoid函数。</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">g</span> = <span class="title">sigmoid</span><span class="params">(z)</span></span></span><br><span class="line"></span><br><span class="line">g = <span class="built_in">zeros</span>(<span class="built_in">size</span>(z));</span><br><span class="line"></span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE=========================</span></span><br><span class="line">g = <span class="number">1</span> ./ (<span class="number">1</span>+<span class="built_in">exp</span>(-z));</span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE=========================</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>这题我本来的用的是两个循环分别表示行与列，进行遍历将每个元素执行sigmoid函数…但是后来看到了这种点运算的方法，代码简洁优美多了，所以我就po这种方法的啦。</p>
+<h3 id="Cost-function-and-gradient"><a href="#Cost-function-and-gradient" class="headerlink" title="Cost function and gradient"></a>Cost function and gradient</h3><p>如果前面sigmoid函数代码没有问题的话，我们就可以用它来完成逻辑回归的成本函数以及其梯度的计算。如果你把线性回归的成本函数直接用作逻辑回归的成本函数的话，你会发现此时的成本函数图形显示被称为”<em>非凸函数</em>“，梯度下降算法就不能用了。事实上，逻辑回归的成本函数是这样的：<br>$$<br>J(θ) = \frac{1}{m}\sum^{m}<em>{i=1}{[-y^{(i)}log(h</em>{θ}(x^{(i)}))-(1-y^{(i)})log(1-h_{θ}(x^{(i)}))]}<br>$$<br>成本的梯度是一个与 <em>θ</em> 长度相等的向量，其中 $j^{th}$ 元素的定义如下：<br>$$<br>\frac{∂J(θ)}{∂θ<em>{j}} = \frac{1}{m}\sum^{m}</em>{i=1}{(h_{θ}(x^{(i)})-y^{(i)})x^{(i)}<em>{j}}<br>$$<br>这个梯度公式看起来与线性回归梯度一摸一样，但实际上是不同的，因为它们的 $h</em>{θ}(x)$ 不一致的。</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[J, grad]</span> = <span class="title">costFunction</span><span class="params">(theta, X, y)</span></span></span><br><span class="line"></span><br><span class="line">m = <span class="built_in">length</span>(y);</span><br><span class="line"></span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE=========================</span></span><br><span class="line">J = <span class="number">1</span>/m * (-y' * <span class="built_in">log</span>(sigmoid(X*theta)) - (<span class="number">1</span>-y)'*<span class="built_in">log</span>(<span class="number">1</span>-sigmoid(X*theta)));</span><br><span class="line">grad = <span class="number">1</span>/m * X' * (sigmoid(X*theta)-y);</span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE=========================</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<h3 id="Learning-parameters-using-fminunc"><a href="#Learning-parameters-using-fminunc" class="headerlink" title="Learning parameters using fminunc"></a>Learning parameters using <em>fminunc</em></h3><p>在之前的作业中，我们利用梯度下降算法找出了了线性回归模型的最佳参数 <em>θ</em> ，我们编写了一个成本函数并计算了梯度，然后在迭代中进行梯度下降。在这一节我们利用MATLAB的内置函 <em>fminunc</em> 更加高效的做到同样的作用。</p>
+<p>在这题中，我们希望利用 <em>fminunc</em> 函数来得到使逻辑回归的成本最优化的参数 <em>θ</em> 。具体来说，当我们使用这个函数时，我们一般需要传递三个参数：</p>
+<ul>
+<li>我们试图优化的参数的初始值</li>
+<li>一个当我们给定训练集和特定的 <em>θ</em> 时，能够计算逻辑回归成本和梯度的函数</li>
+<li>还有这个函数的可选项，这个因为比较常见，所以是我自己补充上的</li>
+</ul>
+<p>　　在前面练习中，我们已经得到了这个需要的函数，所以就可以直接拿来用了</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[m, n] = <span class="built_in">size</span>(X);</span><br><span class="line">initial_theta = <span class="built_in">zeros</span>(n+<span class="number">1</span>, n);</span><br><span class="line"></span><br><span class="line">options = optimset(<span class="string">'GradObj'</span>, <span class="string">'on'</span>, <span class="string">'MaxIter'</span>, <span class="number">400</span>);</span><br><span class="line"></span><br><span class="line">[theta, cost] = fminunc(@(t)(costFunction(t, X, y)), initial_theta, options);</span><br></pre></td></tr></table></figure>
+<p>解释一下参数 <em>options</em> 的意思，将 <em>GradObj</em> 选项置 on 告诉了 <em>fminunc</em> 我们的函数返回成本和渐变，所以 <em>fminunc</em> 在最小化的时候就可会用到渐变。<em>MaxIter</em> 设置为400意为在 <em>fminunc</em> 终止前最多运行400次。<em>（说实话...@的意思我看了作业文档还是不太懂…我觉得或许类似于C++中的函数指针？？？以后学到了再回来填坑吧…)</em></p>
+<p>如果一切都正确，那么 <em>fminunc</em> 就将返回最优化后的成本和 <em>θ</em> 最终值。所以利用这个 <em>fminunc</em> ，我们只需要完成计算成本与梯度的函数就行了。而且这个函数的性能也比我们自己写的循环的那种梯度下降算法要优秀的多。</p>
+<p>这个最终的 <em>θ</em> 值也会被用来绘制训练集上的决策边界(<em>Decision Boundary</em>)，绘图的函数作业已经帮我们写好了，看一看学习一波就好</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">plotDecisionBoundary</span><span class="params">(theta, X, y)</span></span></span><br><span class="line"></span><br><span class="line">plotData(X(:, <span class="number">2</span>:<span class="number">3</span>)), y);</span><br><span class="line"><span class="built_in">hold</span> on;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">size</span>(X, <span class="number">2</span>) &lt;= <span class="number">3</span></span><br><span class="line">	<span class="comment">% Only need 2 points to define a line, so choose two endpoints</span></span><br><span class="line">	plot_x = [<span class="built_in">min</span>(X(:,<span class="number">2</span>))<span class="number">-2</span>, <span class="built_in">max</span>(X(:,<span class="number">2</span>))+<span class="number">2</span>];</span><br><span class="line">	<span class="comment">% Calculate the decision boundary line</span></span><br><span class="line">	plot_y = (<span class="number">-1.</span>/theta(<span class="number">3</span>)).*theta(<span class="number">2</span>).*plot_x + theta(<span class="number">1</span>);</span><br><span class="line">	<span class="built_in">plot</span>(plot_x, plot_y);</span><br><span class="line">	<span class="built_in">legend</span>(<span class="string">'Admitted'</span>, <span class="string">'Not admitted'</span>, <span class="string">'Decision Boundary'</span>)</span><br><span class="line">	axis([<span class="number">30</span>, <span class="number">100</span>, <span class="number">30</span>, <span class="number">100</span>])</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">	<span class="comment">% Here is the grid range</span></span><br><span class="line">	u = <span class="built_in">linspace</span>(<span class="number">-1</span>, <span class="number">1.5</span>, <span class="number">50</span>);</span><br><span class="line">	v = <span class="built_in">linspace</span>(<span class="number">-1</span>, <span class="number">1.5</span>, <span class="number">50</span>);</span><br><span class="line">	z = <span class="built_in">zeros</span>(<span class="built_in">length</span>(u), <span class="built_in">length</span>(v));</span><br><span class="line">	<span class="comment">% Evaluate z = theta*x over the grid</span></span><br><span class="line">	<span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">1</span>:<span class="built_in">length</span>(u)</span><br><span class="line">		<span class="keyword">for</span> <span class="built_in">j</span> = <span class="number">1</span>:<span class="built_in">length</span>(v)</span><br><span class="line">			z(<span class="built_in">i</span>,<span class="built_in">j</span>) = mapFeature(u(<span class="built_in">i</span>), v(<span class="built_in">j</span>))*theta;</span><br><span class="line">		<span class="keyword">end</span></span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	z = z';</span><br><span class="line">	</span><br><span class="line">	countour(u, v, z, [<span class="number">0</span>,, <span class="number">0</span>], <span class="string">'LineWidth'</span>, <span class="number">2</span>)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="built_in">hold</span> off</span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">out</span> = <span class="title">mapFeature</span><span class="params">(X1, X2)</span></span></span><br><span class="line"><span class="comment">% MAPFEATURE Feature mapping function to polynomial features</span></span><br><span class="line"><span class="comment">%	 MAPFEATURE(X1, X2) maps the two input features</span></span><br><span class="line"><span class="comment">%	 to quadratic features used in the regularization exercise.	</span></span><br><span class="line"></span><br><span class="line">degree = <span class="number">6</span>;</span><br><span class="line">out = <span class="built_in">ones</span>(<span class="built_in">size</span>(X1(:,<span class="number">1</span>)));</span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">1</span>:degree</span><br><span class="line">	<span class="keyword">for</span> <span class="built_in">j</span> = <span class="number">0</span>:<span class="built_in">i</span></span><br><span class="line">		out(:, <span class="keyword">end</span>+<span class="number">1</span>) = (X1.^(<span class="built_in">i</span>-<span class="built_in">j</span>)).*(X2.^<span class="built_in">j</span>);</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p><img src="http://p7jn6eeff.bkt.clouddn.com/ML/ex2/2.png" alt=""></p>
+<h3 id="Evaluating-logistic-regression"><a href="#Evaluating-logistic-regression" class="headerlink" title="Evaluating logistic regression"></a>Evaluating logistic regression</h3><p>当计算好参数后我们就可以利用这个模型来预测是否一个学生会被录取了。对于一个考试一位45分和考试二为85分的学生，我们利用这个模型，如果正确的话应该可以看到他被录取的概率是为0.776。</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">prob = sigmoid([<span class="number">1</span> <span class="number">45</span> <span class="number">85</span>] * theta);</span><br></pre></td></tr></table></figure>
+<p>评估我们参数质量一种方法是查看模型对我们训练集预测的程度，所以完成 <em>predict.m</em> ，利用得到的参数 <em>θ</em> 来得到预测的结果</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">p</span> = <span class="title">predict</span><span class="params">(theta, X)</span></span></span><br><span class="line"></span><br><span class="line">m = <span class="built_in">size</span>(X, <span class="number">1</span>);</span><br><span class="line">p = <span class="built_in">zeros</span>(m, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE=========================</span></span><br><span class="line">temp = sigmoid(X*theta);</span><br><span class="line">p = temp &gt; <span class="number">0.5</span>;</span><br><span class="line"><span class="comment">% =========================YOUR CODE HERE=========================</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Regularized-logistic-regression"><a href="#Regularized-logistic-regression" class="headerlink" title="Regularized logistic regression"></a>Regularized logistic regression</h1><p>假设我们是工厂的产品经理，在两个不同的两项测试中获得了一些芯片的测试结果。从这两项测试中，我们需要确定是否应该确认这些芯片质量是合格的。</p>
+<h2 id="Visualization-the-data"><a href="#Visualization-the-data" class="headerlink" title="Visualization the data"></a>Visualization the data</h2><p>与之前一部分练习相同，我们用 <em>plotData( )</em> 来画出图像。轴是两个测试的分数，正数(y=1)表示质量可接受，负数(y=-1)相反。</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">data = load(<span class="string">'ex2data2.txt'</span>);</span><br><span class="line">X = data(:, [<span class="number">1</span>,<span class="number">2</span>]); y = data(:, <span class="number">3</span>);</span><br><span class="line"></span><br><span class="line">plotData(X, y);</span><br><span class="line"></span><br><span class="line"><span class="built_in">hold</span> on;</span><br><span class="line">xlabel(<span class="string">'Microchip Test1'</span>)</span><br><span class="line">ylabel(<span class="string">'Microchip Test2'</span>)</span><br><span class="line"><span class="built_in">legend</span>(<span class="string">'y=1'</span>, <span class="string">'y=0'</span>)</span><br><span class="line"><span class="built_in">hold</span> off;</span><br></pre></td></tr></table></figure>
+<p><img src="http://p7jn6eeff.bkt.clouddn.com/ML/ex2/3.png" alt=""></p>
+<p>由图我们能知道不能再像之前一样通过绘制直线划分正面和负面的例子了。因此直接在这个数据集上应用逻辑回归表现并不好，因为逻辑回归只能找到线性决策边界。</p>
+<h2 id="Feature-mapping"><a href="#Feature-mapping" class="headerlink" title="Feature mapping"></a>Feature mapping</h2><p>为了更好的适应数据分布，我们可以为每个数据点创建更多的特征。我们将把特征映射到x1和x2的所有多项式，直到6个幂。在 <em>mapFeature.m</em> 中，也已经给出了实现，因为前面画图的函数也有用到，所以在前面就给出代码了。<br>$$<br>mapFeature(x) = \begin{bmatrix}<br>1\<br>x_{1}\<br>x_{2}\<br>x_{1}^{2}\<br>x_1x_2\<br>x_{2}^{2}\<br>x_{1}^{3}\<br>.\.\<br>x_{1}x_{2}^{5}\<br>x_{2}^{6}<br>\end{bmatrix}<br>$$<br>通过这种映射，我们两个特征的向量就被转换成28维向量。在这个高维特征向量上训练的逻辑回归将会具有更复杂的决策边界，我们在二维图中绘制时就将呈现非线性的图形。</p>
+<h2 id="Cost-function-and-gradient-1"><a href="#Cost-function-and-gradient-1" class="headerlink" title="Cost function and gradient"></a>Cost function and gradient</h2><p>现在我们要完成实现计算正则化逻辑回归的成本函数和梯度的代码。</p>
+<p>逻辑回归的成本函数定义如下：<br>$$<br>J(θ) = \frac{1}{m}\sum_{i=1}^{m}[-y^{(i)}log(h_{θ}(x^{(i)}))-(1-y^{(i)})log(1-h_{θ}(x^{(i)}))] + \frac{λ}{2m}\sum_{j=1}^{n}θ<em>{j}^{2}<br>$$<br>需要注意的是，参数 $θ</em>{0}$ 不需要调整。因为MATLAB中索引是从1开始的，也就是说不需要调整theta(1)的值。</p>
+<p>成本函数的梯度是一个向量，其中 $j^{th}$ 的元素定义如下：<br>$$<br>\frac{∂J(θ)}{∂θ<em>{0}} = \frac{1}{m}\sum</em>{i=1}^{m}(h_{θ}(x^{(i)})-y^{(i)})x_{j}^{i} \qquad for \ j=0<br>$$</p>
+<p>$$<br>\frac{∂J(θ)}{∂θ<em>{0}} = \frac{1}{m}\sum</em>{i=1}^{m}(h_{θ}(x^{(i)})-y^{(i)})x_{j}^{i}+\frac{λ}{m}θ_{j} \qquad for \ j ≥ 1<br>$$</p>
+<p>所以根据这两个公式，我们就可以写出代码了</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[J, grad]</span> = <span class="title">costFunctionReg</span><span class="params">(theta, X, y, lambda)</span></span></span><br><span class="line"></span><br><span class="line">m = <span class="built_in">length</span>(y);</span><br><span class="line">grad = <span class="built_in">zeros</span>(<span class="built_in">size</span>(theta));</span><br><span class="line"></span><br><span class="line">J = <span class="number">1</span>/m * (-y'*<span class="built_in">log</span>(sigmoid(X*theta)) - (<span class="number">1</span>-y)'*<span class="built_in">log</span>(<span class="number">1</span>-sigmoid(X*theta)))...</span><br><span class="line">	+ (sum(theta.^<span class="number">2</span>) - theta(<span class="number">1</span>).^<span class="number">2</span>) * lambda/(<span class="number">2</span>*m);</span><br><span class="line">	</span><br><span class="line">grad(<span class="number">1</span>) = (X(:,<span class="number">1</span>)' * (sigmoid(X*theta)-y)) ./ m;</span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">2</span>:<span class="built_in">size</span>(theta)</span><br><span class="line">	grad(<span class="built_in">i</span>) = (X(:,<span class="built_in">i</span>)' * (sigmoid(X*theta)-y)) ./ m + lambda/m*theta(<span class="built_in">i</span>);</span><br></pre></td></tr></table></figure>
+<p>###Learning parameters using  <em>fminunc</em> </p>
+<p>和之前的那题一样，忘记了可以往前翻回忆一下</p>
+<h2 id="Plotting-the-decision-boundary"><a href="#Plotting-the-decision-boundary" class="headerlink" title="Plotting the decision boundary"></a>Plotting the decision boundary</h2><p>作业中已经提供了绘制非线性决策边界的函数 <em>plotDecisionBoundary</em> </p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">plotDecisionBoundary</span><span class="params">(theta, X, y)</span></span></span><br><span class="line"></span><br><span class="line">plotData(X(:,<span class="number">2</span>:<span class="number">3</span>), y);</span><br><span class="line"><span class="built_in">hold</span> on</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">size</span>(X, <span class="number">2</span>) &lt;= <span class="number">3</span></span><br><span class="line">	plot_x = [<span class="built_in">min</span>(X(:,<span class="number">2</span>))<span class="number">-2</span>,  <span class="built_in">max</span>(X(:,<span class="number">2</span>))+<span class="number">2</span>];</span><br><span class="line">	plot_y = (<span class="number">-1.</span>/theta(<span class="number">3</span>)).*(theta(<span class="number">2</span>).*plot_x + theta(<span class="number">1</span>));</span><br><span class="line">	<span class="built_in">plot</span>(plot_x, plot_y)</span><br><span class="line">	<span class="built_in">legend</span>(<span class="string">'Admitted'</span>, <span class="string">'Not admitted'</span>, <span class="string">'Decision Boundary'</span>)</span><br><span class="line">	axis([<span class="number">30</span>, <span class="number">100</span>, <span class="number">30</span>, <span class="number">100</span>])</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">	u = <span class="built_in">linspace</span>(<span class="number">-1</span>, <span class="number">1.5</span>, <span class="number">50</span>);</span><br><span class="line">	v = <span class="built_in">linspace</span>(<span class="number">-1</span>, <span class="number">1.5</span>, <span class="number">50</span>);</span><br><span class="line">	z = <span class="built_in">zeros</span>(<span class="built_in">length</span>(u), <span class="built_in">length</span>(v));</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">1</span>:<span class="built_in">length</span>(u)</span><br><span class="line">		<span class="keyword">for</span> <span class="built_in">j</span> = <span class="number">1</span>:<span class="built_in">length</span>(v)</span><br><span class="line">			z(<span class="built_in">i</span>,<span class="built_in">j</span>) = mapFeature(u(<span class="built_in">i</span>), v(<span class="built_in">j</span>))*theta;</span><br><span class="line">		<span class="keyword">end</span></span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	z = z'</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="built_in">hold</span> off</span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p><img src="http://p7jn6eeff.bkt.clouddn.com/ML/ex2/4.png" alt=""></p>
+<h2 id="Optional-ungraded-exercises"><a href="#Optional-ungraded-exercises" class="headerlink" title="Optional (ungraded) exercises"></a>Optional (ungraded) exercises</h2><p>这题让我们随意修改 <em>λ</em> 的值来观察图像的变化。因为 <em>λ</em> 的值和罚值密密相关，所以当 <em>λ</em> 偏小时，正则化会偏向画出完美的决策边界，从而导致 <strong>过拟合(overfit)</strong> 的情况。而当 <em>λ</em> 的值过大时，正则化会偏向尽量缩小特征的系数，因此会出现 <strong>欠拟合(undefit)</strong> 的情况。 </p>
+<p>下面分别是当我们给了两个极端，<em>λ</em> = 0 与 <em>λ</em> = 100 时的图像</p>
+<p><img src="http://p7jn6eeff.bkt.clouddn.com/ML/ex2/5.png" alt=""><br>$$<br>No\ regularization\ (Overﬁtting) (λ = 0)<br>$$</p>
+<p><img src="http://p7jn6eeff.bkt.clouddn.com/ML/ex2/6.png" alt=""><br>$$<br>Too\ much\ regularization\ (Underﬁtting) (λ = 100)<br>$$</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/18/机器学习：编程作业（一）/" rel="next" title="机器学习：编程作业（一）">
+                <i class="fa fa-chevron-left"></i> 机器学习：编程作业（一）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/30/机器学习：编程作业（三）/" rel="prev" title="机器学习：编程作业（三）">
+                机器学习：编程作业（三） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.png" alt="0ran9e">
+            
+              <p class="site-author-name" itemprop="name">0ran9e</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:971109888@qq.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://weibo.com/3190492602" target="_blank" title="微博"><i class="fa fa-fw fa-weibo"></i>微博</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Logistic-Regression"><span class="nav-number">1.</span> <span class="nav-text">Logistic Regression</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Visualizing-the-data"><span class="nav-number">1.1.</span> <span class="nav-text">Visualizing the data</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Implementation"><span class="nav-number">1.2.</span> <span class="nav-text">Implementation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Warmup-exercise：sigmoid-function"><span class="nav-number">1.2.1.</span> <span class="nav-text">Warmup exercise：sigmoid function</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cost-function-and-gradient"><span class="nav-number">1.2.2.</span> <span class="nav-text">Cost function and gradient</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Learning-parameters-using-fminunc"><span class="nav-number">1.2.3.</span> <span class="nav-text">Learning parameters using fminunc</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Evaluating-logistic-regression"><span class="nav-number">1.2.4.</span> <span class="nav-text">Evaluating logistic regression</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Regularized-logistic-regression"><span class="nav-number">2.</span> <span class="nav-text">Regularized logistic regression</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Visualization-the-data"><span class="nav-number">2.1.</span> <span class="nav-text">Visualization the data</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Feature-mapping"><span class="nav-number">2.2.</span> <span class="nav-text">Feature mapping</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cost-function-and-gradient-1"><span class="nav-number">2.3.</span> <span class="nav-text">Cost function and gradient</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Plotting-the-decision-boundary"><span class="nav-number">2.4.</span> <span class="nav-text">Plotting the decision boundary</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Optional-ungraded-exercises"><span class="nav-number">2.5.</span> <span class="nav-text">Optional (ungraded) exercises</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">0ran9e</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.2.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.2.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.2.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.2.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.2.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.2.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.2.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/npm/mathjax@2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
+  
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
