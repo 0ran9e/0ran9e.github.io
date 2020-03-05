@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.2.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next-me.png?v=6.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next-me.png?v=6.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next-me.png?v=6.2.0">
+
+
+  <link rel="mask-icon" href="/images/logo-me.svg?v=6.2.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="文件操作注意区分系统调用和标准C库函数，一般来说，使用文件描述符的是系统调用，而使用文件指针的是标准C库函数。 打开、关闭文件open、close123456//打开一个文件，返回其文件描述符。int open(const char *pathname, int flags);    //文件路径 打开方式int open(const char *pathname, int flags, mode">
+<meta name="keywords" content="Linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux系统编程">
+<meta property="og:url" content="http://0ran9e.com/2020/03/01/Linux系统编程/index.html">
+<meta property="og:site_name" content="0ran9e&#39;s Blog">
+<meta property="og:description" content="文件操作注意区分系统调用和标准C库函数，一般来说，使用文件描述符的是系统调用，而使用文件指针的是标准C库函数。 打开、关闭文件open、close123456//打开一个文件，返回其文件描述符。int open(const char *pathname, int flags);    //文件路径 打开方式int open(const char *pathname, int flags, mode">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-03-05T09:55:10.133Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux系统编程">
+<meta name="twitter:description" content="文件操作注意区分系统调用和标准C库函数，一般来说，使用文件描述符的是系统调用，而使用文件指针的是标准C库函数。 打开、关闭文件open、close123456//打开一个文件，返回其文件描述符。int open(const char *pathname, int flags);    //文件路径 打开方式int open(const char *pathname, int flags, mode">
+
+
+
+
+
+
+  <link rel="canonical" href="http://0ran9e.com/2020/03/01/Linux系统编程/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux系统编程 | 0ran9e's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">0ran9e's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">心之所向 素履以往</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://0ran9e.com/2020/03/01/Linux系统编程/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="0ran9e">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="0ran9e's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Linux系统编程
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2020-03-01 17:00:42" itemprop="dateCreated datePublished" datetime="2020-03-01T17:00:42+08:00">2020-03-01</time>
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/计算机/" itemprop="url" rel="index"><span itemprop="name">计算机</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="文件操作"><a href="#文件操作" class="headerlink" title="文件操作"></a>文件操作</h1><p>注意区分<strong>系统调用</strong>和<strong>标准C库函数</strong>，一般来说，使用文件描述符的是系统调用，而使用文件指针的是标准C库函数。</p>
+<h2 id="打开、关闭文件"><a href="#打开、关闭文件" class="headerlink" title="打开、关闭文件"></a>打开、关闭文件</h2><h3 id="open、close"><a href="#open、close" class="headerlink" title="open、close"></a>open、close</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//打开一个文件，返回其文件描述符。</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">open</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, <span class="keyword">int</span> flags)</span></span>;    <span class="comment">//文件路径 打开方式</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">open</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, <span class="keyword">int</span> flags, <span class="keyword">mode_t</span> mode)</span></span>;    <span class="comment">//文件路径 打开方式 创建时用的权限</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//关闭一个文件，成功返回0，失败返回-1</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">close</span><span class="params">(<span class="keyword">int</span> fildes)</span></span>;    <span class="comment">//文件描述符</span></span><br></pre></td></tr></table></figure>
+<p>flags 和 mode 都是一组掩码的合成值，flags 表示打开或创建的方式，mode 表示文件的访问权限。</p>
+<p>其中flags的可选项有：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">掩码</th>
+<th style="text-align:center">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">O_RDONLY</td>
+<td style="text-align:center">以只读的方式打开</td>
+</tr>
+<tr>
+<td style="text-align:center">O_WRONLY</td>
+<td style="text-align:center">以只写的方式打开</td>
+</tr>
+<tr>
+<td style="text-align:center">O_RDWR</td>
+<td style="text-align:center">以读写的方式打开</td>
+</tr>
+<tr>
+<td style="text-align:center">O_CREAT</td>
+<td style="text-align:center">如果文件不存在，则创建文件</td>
+</tr>
+<tr>
+<td style="text-align:center">O_EXCL</td>
+<td style="text-align:center">仅与 O_CREAT 连用，如果文件已存在，则强 制 open 失败</td>
+</tr>
+<tr>
+<td style="text-align:center">O_TRUNC</td>
+<td style="text-align:center">如果文件存在，将文件的长度截至 0</td>
+</tr>
+<tr>
+<td style="text-align:center">O_APPEND</td>
+<td style="text-align:center">已追加的方式打开文件，每次调用 write 时， 文件指针自动先移到文件尾，用于多进程写同一个文件的情况。</td>
+</tr>
+<tr>
+<td style="text-align:center">O_NONBLOCK</td>
+<td style="text-align:center">非阻塞方式打开，无论有无数据读取或等 待，都会立即返回进程之中。</td>
+</tr>
+<tr>
+<td style="text-align:center">O_NODELAY</td>
+<td style="text-align:center">非阻塞方式打开</td>
+</tr>
+<tr>
+<td style="text-align:center">O_SYNC</td>
+<td style="text-align:center">同步打开文件，只有在数据被真正写入物理设备设备后才返回。用得不多，对磁盘伤害比较大。</td>
+</tr>
+</tbody>
+</table>
+</div>
+<a id="more"></a>
+<h4 id="示例一：使用open打开一个文件"><a href="#示例一：使用open打开一个文件" class="headerlink" title="示例一：使用open打开一个文件"></a>示例一：使用open打开一个文件</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ARGS_CHECK(argc, <span class="number">2</span>);</span><br><span class="line">    <span class="keyword">int</span> fd;</span><br><span class="line">  </span><br><span class="line">    <span class="comment">// 注意这个权限是会受该用户的掩码影响的，比如虽然此时是666，但因root掩码002，所以最后权限为 664</span></span><br><span class="line">    fd = open(argv[<span class="number">1</span>], O_RDWR|O_CREAT, <span class="number">0666</span>);	</span><br><span class="line">    ERROR_CHECK(fd, <span class="number">-1</span>, <span class="string">"open"</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"fd = %d\n"</span>, fd);</span><br><span class="line">  	close(fd);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="fopen、fclose"><a href="#fopen、fclose" class="headerlink" title="fopen、fclose"></a>fopen、fclose</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//成功返回一个文件指针，失败返回NULL</span></span><br><span class="line"><span class="function">FILE *<span class="title">fopen</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *path,<span class="keyword">const</span> <span class="keyword">char</span> *mode)</span></span>;    <span class="comment">//文件路径 打开方式</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">fclose</span><span class="params">(FILE *stream)</span></span>;    <span class="comment">//文件路径</span></span><br></pre></td></tr></table></figure>
+<p>其中参数mode的值可以为：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">模式</th>
+<th style="text-align:center">读</th>
+<th style="text-align:center">写</th>
+<th style="text-align:center">位置</th>
+<th style="text-align:center">截断原内容</th>
+<th style="text-align:center">创建</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">rb</td>
+<td style="text-align:center">√</td>
+<td style="text-align:center">×</td>
+<td style="text-align:center">文件头</td>
+<td style="text-align:center">×</td>
+<td style="text-align:center">×</td>
+</tr>
+<tr>
+<td style="text-align:center">rb+</td>
+<td style="text-align:center">√</td>
+<td style="text-align:center">√</td>
+<td style="text-align:center">文件头</td>
+<td style="text-align:center">×</td>
+<td style="text-align:center">×</td>
+</tr>
+<tr>
+<td style="text-align:center">wb</td>
+<td style="text-align:center">×</td>
+<td style="text-align:center">√</td>
+<td style="text-align:center">文件头</td>
+<td style="text-align:center">√</td>
+<td style="text-align:center">√</td>
+</tr>
+<tr>
+<td style="text-align:center">wb+</td>
+<td style="text-align:center">√</td>
+<td style="text-align:center">√</td>
+<td style="text-align:center">文件头</td>
+<td style="text-align:center">√</td>
+<td style="text-align:center">√</td>
+</tr>
+<tr>
+<td style="text-align:center">ab</td>
+<td style="text-align:center">×</td>
+<td style="text-align:center">√</td>
+<td style="text-align:center">文件尾</td>
+<td style="text-align:center">×</td>
+<td style="text-align:center">√</td>
+</tr>
+<tr>
+<td style="text-align:center">ab+</td>
+<td style="text-align:center">√</td>
+<td style="text-align:center">√</td>
+<td style="text-align:center">文件尾</td>
+<td style="text-align:center">×</td>
+<td style="text-align:center">√</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>实际上 <code>fopen</code> 是<strong>调用</strong> <code>open</code> 来实现的，二者的重要区别在于 <code>open</code> 是系统调用，而  <code>fopen</code> 是标准C库函数。<code>open</code> 打开文件时，仅在内核区新建并管理该文件的文件描述符。而用 <code>fopen</code> 打开文件时，除去同样在内核新建的文件描述符外，还在用户区开辟了一个空间缓冲区（一般为<strong>4K的整数倍</strong>），当我们用 <code>fread</code> <code>fwrite</code> 这类标准C库函数时，我们可以直接使用这个空间缓冲区，从而达到减少频繁调用系统的效果。</p>
+<p>所以，当我们用 <code>fread</code> <code>fwrite</code> 这类标准C库函数时，我们可以直接使用这个空间缓冲区，从而达到减少频繁调用系统的效果。如果使用mmap时，那肯定优先选择open，因为我们此时是用不到用户区的缓冲区的，但像每次只读取一个字节之类的操作时，一般不会考虑 <code>read</code> 而是使用 <code>fgetc</code> 就是因为这样的原因。如果我们坚持要使用 <code>open</code> 的话该如何提高效率呢？此时注意每次读或写长度都最好用4K的整数倍以减少系统调用即可。</p>
+<p>综上所述，可以明白有文件指针时，必定已有与之对应的文件描述符。所以将文件指针转换成文件描述符的函数 <code>int fileno(FILE *stream)</code>  原理就是直接去内核区找对对应的文件描述符。但是如果要从文件描述符得到文件指针，此时用户区是没有与之对应的缓冲区的，所以函数 <code>FILE *fdopen(int fildes, const char *mode)</code> 就是在用户区开辟一个新的缓冲区作为文件指针。</p>
+<h4 id="示例一：文件指针转换文件描述符"><a href="#示例一：文件指针转换文件描述符" class="headerlink" title="示例一：文件指针转换文件描述符"></a>示例一：文件指针转换文件描述符</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ARGS_CHECK(argc, <span class="number">2</span>);</span><br><span class="line">    FILE *fp;</span><br><span class="line">    <span class="keyword">int</span> fd;</span><br><span class="line">    <span class="keyword">char</span> buf[<span class="number">128</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line"></span><br><span class="line">    fp = fopen(argv[<span class="number">1</span>], <span class="string">"rb+"</span>);</span><br><span class="line">    ERROR_CHECK(fp, <span class="literal">NULL</span>, <span class="string">"fopen"</span>);</span><br><span class="line">    <span class="comment">//因为是调用open来实现的，所以此时文件描述符3即是打开的文件</span></span><br><span class="line">    fd = fileno(fp);</span><br><span class="line">    read(fd, buf, <span class="keyword">sizeof</span>(buf));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"fd = %d\n"</span>, fd);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"buf = %s\n"</span>, buf);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="示例二：文件描述符转换文件指针"><a href="#示例二：文件描述符转换文件指针" class="headerlink" title="示例二：文件描述符转换文件指针"></a>示例二：文件描述符转换文件指针</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> buf[<span class="number">128</span>];</span><br><span class="line"></span><br><span class="line">    ARGS_CHECK(argc, <span class="number">2</span>);</span><br><span class="line">    <span class="keyword">int</span> fd = open(argv[<span class="number">1</span>], O_RDWR);</span><br><span class="line">    ERROR_CHECK(fd, <span class="number">-1</span>, <span class="string">"open"</span>);</span><br><span class="line"></span><br><span class="line">    FILE *fp = fdopen(fd, <span class="string">"rb+"</span>);</span><br><span class="line">    ERROR_CHECK(fp, <span class="literal">NULL</span>, <span class="string">"fdopen"</span>);</span><br><span class="line">    <span class="comment">//如果在这里close, fd关闭时后面也将报错, 因为fp是依赖于fd的</span></span><br><span class="line">    <span class="comment">//close(fd);</span></span><br><span class="line">    <span class="keyword">char</span> *p = fgets(buf, <span class="keyword">sizeof</span>(buf), fp);</span><br><span class="line">    ERROR_CHECK(p, <span class="literal">NULL</span>, <span class="string">"fgets"</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"buf = %s\n"</span>, buf);</span><br><span class="line"></span><br><span class="line">    fclose(fp);    <span class="comment">//关闭fp时也关闭fd</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<hr>
+<p><br></p>
+<h2 id="读、写文件"><a href="#读、写文件" class="headerlink" title="读、写文件"></a>读、写文件</h2><h3 id="read、write"><a href="#read、write" class="headerlink" title="read、write"></a>read、write</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//fd的内容读到buf中，返回读到的个数，出错返回-1，读完返回0</span></span><br><span class="line"><span class="keyword">ssize_t</span> read(<span class="keyword">int</span> fd, <span class="keyword">void</span> *buf, <span class="keyword">size_t</span> count);    <span class="comment">//文件描述符 缓冲区 长度</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//buf的内容写到fd中，返回写入的个数，出错返回-1，写完返回0</span></span><br><span class="line"><span class="keyword">ssize_t</span> write(inf fd, <span class="keyword">const</span> <span class="keyword">void</span> *buf, <span class="keyword">size_t</span> count);    <span class="comment">//文件描述符 缓冲区 长度</span></span><br></pre></td></tr></table></figure>
+<h4 id="示例一：read的简单示例"><a href="#示例一：read的简单示例" class="headerlink" title="示例一：read的简单示例"></a>示例一：read的简单示例</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ARGS_CHECK(argc, <span class="number">2</span>);</span><br><span class="line">    <span class="keyword">int</span> fd;</span><br><span class="line">    <span class="keyword">char</span> buf[<span class="number">128</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line"></span><br><span class="line">    fd = open(argv[<span class="number">1</span>], O_RDWR);</span><br><span class="line">    ERROR_CHECK(fd, <span class="number">-1</span>, <span class="string">"open"</span>);</span><br><span class="line">    <span class="keyword">int</span> ret = read(fd, buf, <span class="keyword">sizeof</span>(buf));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"buf = %s, ret = %d\n"</span>, buf, ret);</span><br><span class="line"></span><br><span class="line">    close(fd);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="示例二：write的简单示例"><a href="#示例二：write的简单示例" class="headerlink" title="示例二：write的简单示例"></a>示例二：write的简单示例</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">    注意我们将一个整型写到文件时，是二进制写入的，在VIM中 :%!xxd 转成16进制查看</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ARGS_CHECK(argc, <span class="number">2</span>);</span><br><span class="line">    <span class="keyword">int</span> fd;</span><br><span class="line"></span><br><span class="line">    fd = open(argv[<span class="number">1</span>], O_RDWR);</span><br><span class="line">    ERROR_CHECK(fd, <span class="number">-1</span>, <span class="string">"open"</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"fd = %d\n"</span>, fd);</span><br><span class="line">    write(fd, &amp;fd, <span class="keyword">sizeof</span>(<span class="keyword">int</span>));</span><br><span class="line"></span><br><span class="line">    close(fd);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="fread、fwrite"><a href="#fread、fwrite" class="headerlink" title="fread、fwrite"></a>fread、fwrite</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//从文件流stream中读取nmemb个元素，写到ptr指向的内存中，每个元素的大小为size个字节</span></span><br><span class="line"><span class="keyword">size_t</span> fread(<span class="keyword">void</span> *ptr, <span class="keyword">size_t</span> size, <span class="keyword">size_t</span> nmemb, FILE *stream);</span><br><span class="line"></span><br><span class="line"><span class="comment">//从ptr指向的内存中读取nmemb个元素，写到文件流stream中，每个元素size个字节</span></span><br><span class="line"><span class="keyword">size_t</span> fwrite(<span class="keyword">const</span> <span class="keyword">void</span> *ptr, <span class="keyword">size_t</span> size, <span class="keyword">size_t</span> nmemb, FILE *stream);</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<hr>
+<p><br></p>
+<h2 id="改变文件大小"><a href="#改变文件大小" class="headerlink" title="改变文件大小"></a>改变文件大小</h2><h3 id="truncate"><a href="#truncate" class="headerlink" title="truncate"></a>truncate</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">truncate</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *path, <span class="keyword">off_t</span> length)</span></span>;</span><br></pre></td></tr></table></figure>
+<h3 id="ftruncate"><a href="#ftruncate" class="headerlink" title="ftruncate"></a>ftruncate</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//将参数fd指定的文件大小改为参数length的大小</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">ftruncate</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">off_t</span> length)</span></span>;    <span class="comment">//文件描述符 修改后的文件大小</span></span><br></pre></td></tr></table></figure>
+<p>fd必须是以写入模式打开的文件，如果原文件大小比参数length打，则超过的部分被删除。因为 <code>mmap</code> 利用DMA是不能修改文件大小的，因此这个函数经常<strong>配合<code>mmap</code>使用</strong>。</p>
+<p><br></p>
+<hr>
+<p><br></p>
+<h2 id="文件定位"><a href="#文件定位" class="headerlink" title="文件定位"></a>文件定位</h2><h3 id="lseek"><a href="#lseek" class="headerlink" title="lseek"></a>lseek</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//将文件的读取点移动到指定位置，返回距离文件开头的位置</span></span><br><span class="line"><span class="keyword">off_t</span> lseek(<span class="keyword">int</span> fd, <span class="keyword">off_t</span> offset, <span class="keyword">int</span> whence);    <span class="comment">//文件描述符 偏移量 从哪开始偏移</span></span><br></pre></td></tr></table></figure>
+<h3 id="fseek"><a href="#fseek" class="headerlink" title="fseek"></a>fseek</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//将文件的读取点移动到指定位置，成功返回0，设置error no</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">fseek</span><span class="params">(FILE *stream, <span class="keyword">long</span> offset, <span class="keyword">int</span> whence)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>参数 whence 可以为：<strong>SEEK_SET</strong> 从文件头开始计算、<strong>SEEK_CUR</strong> 从当前指针开始计算、<strong>SEEK_END</strong> 从文件尾开始计算。<code>lseek</code> 相当于 <code>fseek</code> 与 <code>ftell</code> 组合实现的效果。</p>
+<p>当偏移量大于文件本身的大小时，会改变文件大小并将超出部分填0。这一特性和 <code>ftruncate</code> 一样，经常用来<strong>配合 <code>mmap</code> 使用</strong>。</p>
+<h3 id="示例一：lseek的简单示例"><a href="#示例一：lseek的简单示例" class="headerlink" title="示例一：lseek的简单示例"></a>示例一：lseek的简单示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ARGS_CHECK(argc, <span class="number">2</span>);</span><br><span class="line">    <span class="keyword">int</span> fd;</span><br><span class="line">    <span class="keyword">char</span> buf[<span class="number">128</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line"></span><br><span class="line">    fd = open(argv[<span class="number">1</span>], O_RDWR);</span><br><span class="line">    ERROR_CHECK(fd, <span class="number">-1</span>, <span class="string">"open"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将文件的读写指针偏移到离首部5的位置</span></span><br><span class="line">    <span class="keyword">int</span> ret = lseek(fd, <span class="number">5</span>, SEEK_SET);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"pos = %d\n"</span>, ret);</span><br><span class="line"></span><br><span class="line">    read(fd, buf, <span class="keyword">sizeof</span>(buf));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"buf = %s\n"</span>, buf);</span><br><span class="line"></span><br><span class="line">    close(fd);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="示例二：lseek实现文件空洞"><a href="#示例二：lseek实现文件空洞" class="headerlink" title="示例二：lseek实现文件空洞"></a>示例二：lseek实现文件空洞</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> fd = open(argv[<span class="number">1</span>], O_RDWR | O_CREAT);</span><br><span class="line">    lseek(fd, <span class="number">1024</span>, SEEK_SET);</span><br><span class="line">    write(fd, <span class="string">"a"</span>, <span class="keyword">sizeof</span>(<span class="keyword">char</span>));</span><br><span class="line"></span><br><span class="line">    close(fd);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<hr>
+<p><br></p>
+<h2 id="获取文件信息"><a href="#获取文件信息" class="headerlink" title="获取文件信息"></a>获取文件信息</h2><h3 id="stat"><a href="#stat" class="headerlink" title="stat"></a>stat</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">stat</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, struct stat *buf)</span></span>;    <span class="comment">//文件路径 stat结构体指针</span></span><br></pre></td></tr></table></figure>
+<h3 id="fstat"><a href="#fstat" class="headerlink" title="fstat"></a>fstat</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">fstat</span><span class="params">(<span class="keyword">int</span> fd, struct stat *buf)</span></span>;    <span class="comment">//文件描述符 stat 结构体指针</span></span><br></pre></td></tr></table></figure>
+<p>参数stat是个<strong>传出参数</strong>，他的具体成员如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">stat</span> &#123;</span></span><br><span class="line">       <span class="keyword">dev_t</span>         st_dev;        <span class="comment">/* 如果是设备，返回设备表述符，否则为 0*/</span></span><br><span class="line">       <span class="keyword">ino_t</span>         st_ino;        <span class="comment">/* i节点号*/</span></span><br><span class="line">       <span class="keyword">mode_t</span>        st_mode;       <span class="comment">/* 文件类型与权限，1111 000 111 111 111（重要）*/</span>	                                   <span class="comment">/* 前4位文件类型  后12位都是权限 */</span></span><br><span class="line">       <span class="keyword">nlink_t</span>       st_nlink;      <span class="comment">/* 链接数 */</span></span><br><span class="line">       <span class="keyword">uid_t</span>         st_uid;        <span class="comment">/* 属主ID*/</span></span><br><span class="line">       <span class="keyword">gid_t</span>         st_gid;        <span class="comment">/* 组ID */</span></span><br><span class="line">       <span class="keyword">dev_t</span>         st_rdev;       <span class="comment">/* 设备类型*/</span></span><br><span class="line">       <span class="keyword">off_t</span>         st_size;       <span class="comment">/* 文件大小，字节表示（重要） */</span></span><br><span class="line">       <span class="keyword">blksize_t</span>     st_blksize;    <span class="comment">/* 块大小*/</span></span><br><span class="line">       <span class="keyword">blkcnt_t</span>      st_blocks;     <span class="comment">/* 块数 */</span></span><br><span class="line">       <span class="keyword">time_t</span>        st_atime;      <span class="comment">/* 最后访问时间*/</span></span><br><span class="line">       <span class="keyword">time_t</span>        st_mtime;      <span class="comment">/* 最后修改时间*/</span></span><br><span class="line">       <span class="keyword">time_t</span>        st_ctime;      <span class="comment">/* 最后权限修改时间 */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>对于结构体的成员st_mode，有一组宏可以进行文件类型的判断：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">宏</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">S_ISLNK(mode)</td>
+<td style="text-align:center">判断是否是符号链接</td>
+</tr>
+<tr>
+<td style="text-align:center">S_ISREG(mode)</td>
+<td style="text-align:center">判断是否是普通文件</td>
+</tr>
+<tr>
+<td style="text-align:center">S_ISDIR(mode)</td>
+<td style="text-align:center">判断是否是目录</td>
+</tr>
+<tr>
+<td style="text-align:center">S_ISCHR(mode)</td>
+<td style="text-align:center">判断是否是字符型设备</td>
+</tr>
+<tr>
+<td style="text-align:center">S_ISBLK(mode)</td>
+<td style="text-align:center">判断是否是块设备</td>
+</tr>
+<tr>
+<td style="text-align:center">S_ISFIFO(mode)</td>
+<td style="text-align:center">判断是否是命名管道</td>
+</tr>
+<tr>
+<td style="text-align:center">S_ISSOCK(mode)</td>
+<td style="text-align:center">判断是否是套接字</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h4 id="示例一：打印文件的文件状态"><a href="#示例一：打印文件的文件状态" class="headerlink" title="示例一：打印文件的文件状态"></a>示例一：打印文件的文件状态</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;func.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ARGS_CHECK(argc, <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> ret;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">stat</span> <span class="title">buf</span>;</span></span><br><span class="line"></span><br><span class="line">    ret = stat(argv[<span class="number">1</span>], &amp;buf);</span><br><span class="line">    ERROR_CHECK(ret, <span class="number">-1</span>, <span class="string">"stat"</span>);</span><br><span class="line">		</span><br><span class="line">    <span class="comment">//注意: getpwuid 和 getgrgid 根据uid和gid返回一个所有信息的结构体</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%x  %ld  %s  %s  %ld  %s\n"</span>, buf.st_mode, buf.st_nlink, getpwuid(buf.st_uid)-&gt;pw_name,</span><br><span class="line">           getgrgid(buf.st_gid)-&gt;gr_name, buf.st_size, ctime(&amp;buf.st_mtime));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<hr>
+<p><br></p>
+<h2 id="内存映射"><a href="#内存映射" class="headerlink" title="内存映射"></a>内存映射</h2><h3 id="mmap、munmap"><a href="#mmap、munmap" class="headerlink" title="mmap、munmap"></a>mmap、munmap</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">mmap</span><span class="params">(<span class="keyword">void</span> *addr, <span class="keyword">size_t</span> len, <span class="keyword">int</span> prot, <span class="keyword">int</span> flags, <span class="keyword">int</span> fd, <span class="keyword">off_t</span> offset)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">munmap</span><span class="params">(<span class="keyword">void</span> *addr, <span class="keyword">size_t</span> len)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>把磁盘映射到内存上，不读写文件就能修改文件内容，充分发挥DMA驱动器的效果。在处理比较大的文件，或有多个用户同时访问时，一般都采用mmap，因为比read和write的性能要高。<strong>因为mmap不能改变文件本身大小</strong>，所以若一个空文件映射到内存，若向这块内存写入内容，在munmap时就会报错。</p>
+<ul>
+<li>addr：映射的地址，一般 NULL 自动分配</li>
+<li>len：文件大小，可用<strong>stat</strong>获取，工作中要<strong>4K对齐</strong></li>
+<li>prot：映射到内存的权限，位权限，有PROT_EXEC(可执行)、PROT_READ(可读)、ROT_WRITE(可写)</li>
+<li>flags：MAP_SHARED</li>
+<li>fd：文件描述符</li>
+<li>offset：偏移</li>
+</ul>
+<h3 id="示例一：mmap简单示例"><a href="#示例一：mmap简单示例" class="headerlink" title="示例一：mmap简单示例"></a>示例一：mmap简单示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;func.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ARGS_CHECK(argc, <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> fd;</span><br><span class="line"></span><br><span class="line">    fd = open(argv[<span class="number">1</span>], O_RDWR);</span><br><span class="line">    ERROR_CHECK(fd, <span class="number">-1</span>, <span class="string">"open"</span>)</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"fd = %d\n"</span>, fd);</span><br><span class="line">    <span class="keyword">char</span> *p;</span><br><span class="line">    p = (<span class="keyword">char</span> *)mmap(<span class="literal">NULL</span>, <span class="number">5</span>, PROT_READ|PROT_WRITE, MAP_SHARED, fd, <span class="number">0</span>);</span><br><span class="line">    ERROR_CHECK(p, (<span class="keyword">char</span> *)<span class="number">-1</span>, <span class="string">"mmap"</span>);</span><br><span class="line"></span><br><span class="line">    p[<span class="number">5</span>] = <span class="string">'\0'</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%s\n"</span>, p);</span><br><span class="line">    p[<span class="number">0</span>] = <span class="string">'H'</span>;</span><br><span class="line"></span><br><span class="line">    munmap(p, <span class="number">5</span>);</span><br><span class="line"></span><br><span class="line">    close(fd);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<hr>
+<p><br></p>
+<h2 id="文件描述符的复制"><a href="#文件描述符的复制" class="headerlink" title="文件描述符的复制"></a>文件描述符的复制</h2><h3 id="dup"><a href="#dup" class="headerlink" title="dup"></a>dup</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">dup</span><span class="params">(<span class="keyword">int</span> oldfd)</span></span>;</span><br></pre></td></tr></table></figure>
+<h3 id="dup2"><a href="#dup2" class="headerlink" title="dup2"></a>dup2</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">dup2</span><span class="params">(<span class="keyword">int</span> oldfd, <span class="keyword">int</span> newfd)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>系统调用函数 dup 和 dup2 可以实现文件描述符的复制，经常用来重定向进程的stdin(0),stdout(1),stderr(2)。</p>
+<p>dup 返回新的文件描述符(没有使用的文件描述符的最小编号)。这个新的描述符是旧文件描述符 的拷贝。这意味着两个描述符共享同一个数据结构。</p>
+<p>dup2 允许调用者用一个有效描述符(oldfd)和目标描述符(newfd)，函数成功返回时，目标描述符将 变成旧描述符的复制品，此时两个文件描述符现在都指向同一个文件，并且是函数第一个参数(也就是 oldfd)指向的文件。</p>
+<h3 id="示例一：dup版重定向标准输出"><a href="#示例一：dup版重定向标准输出" class="headerlink" title="示例一：dup版重定向标准输出"></a>示例一：dup版重定向标准输出</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;func.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ARGS_CHECK(argc, <span class="number">2</span>);</span><br><span class="line">    <span class="keyword">int</span> fd, fd_copy;</span><br><span class="line"></span><br><span class="line">    fd = open(argv[<span class="number">1</span>], O_RDWR);</span><br><span class="line">    ERROR_CHECK(fd, <span class="number">-1</span>, <span class="string">"open"</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"now you see me\n"</span>);</span><br><span class="line">    close(<span class="number">1</span>);           <span class="comment">//关闭标准输出</span></span><br><span class="line">    fd_copy = dup(fd);  <span class="comment">//文件描述符的复制</span></span><br><span class="line">    close(fd);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"fd_copy = %d\n"</span>, fd_copy);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"now you don't\n"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="示例二：dup2版重定向标准输出"><a href="#示例二：dup2版重定向标准输出" class="headerlink" title="示例二：dup2版重定向标准输出"></a>示例二：dup2版重定向标准输出</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;func.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ARGS_CHECK(argc, <span class="number">2</span>);</span><br><span class="line">    <span class="keyword">int</span> fd, fd_copy;</span><br><span class="line"></span><br><span class="line">    fd = open(argv[<span class="number">1</span>], O_RDWR);</span><br><span class="line">    ERROR_CHECK(fd, <span class="number">-1</span>, <span class="string">"open"</span>);</span><br><span class="line"></span><br><span class="line">    dup2(<span class="number">1</span>, <span class="number">100</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"now you see me\n"</span>);</span><br><span class="line">    fd_copy = dup2(fd, <span class="number">1</span>);    <span class="comment">//文件描述符的复制</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"fd_copy = %d\n"</span>, fd_copy);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"now you don't\n"</span>);</span><br><span class="line"></span><br><span class="line">    dup2(<span class="number">100</span>, <span class="number">1</span>);    <span class="comment">//标准输出复原</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"now you see me\n"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<hr>
+<p><br></p>
+<h2 id="几个常用的文件操作函数"><a href="#几个常用的文件操作函数" class="headerlink" title="几个常用的文件操作函数"></a>几个常用的文件操作函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 改变文件权限</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">chmod</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* path, <span class="keyword">mode_t</span> mode)</span></span>;    <span class="comment">//mode 形如:0777</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 获得当前文件的绝对路径</span></span><br><span class="line"><span class="function"><span class="keyword">char</span> *<span class="title">getcwd</span><span class="params">(<span class="keyword">char</span> *buf, <span class="keyword">size_t</span> size)</span></span>;    <span class="comment">//通常可用 getcwd(NULL, 0)</span></span><br></pre></td></tr></table></figure>
+<p><br></p>
+<p><br></p>
+<hr>
+<p><br></p>
+<p><br></p>
+<h1 id="文件夹操作"><a href="#文件夹操作" class="headerlink" title="文件夹操作"></a>文件夹操作</h1><h2 id="创建文件夹"><a href="#创建文件夹" class="headerlink" title="创建文件夹"></a>创建文件夹</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 成功返回0，失败返回 -1 </span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">mkdir</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, <span class="keyword">mode_t</span> mode)</span></span>;    <span class="comment">//文件路径 权限,如0777</span></span><br></pre></td></tr></table></figure>
+<p>注意此处的权限也是受掩码umask影响的。</p>
+<p><br></p>
+<hr>
+<p><br></p>
+<h2 id="删除文件夹"><a href="#删除文件夹" class="headerlink" title="删除文件夹"></a>删除文件夹</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 成功返回0，失败返回 -1 </span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rmdir</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname)</span></span>;    <span class="comment">//文件路径</span></span><br></pre></td></tr></table></figure>
+<p><br></p>
+<hr>
+<p><br></p>
+<h2 id="打开文件夹"><a href="#打开文件夹" class="headerlink" title="打开文件夹"></a>打开文件夹</h2><p><strong>opendir</strong>返回的<strong>DIR</strong>结构就像一个链表一样，每次<strong>readdir</strong>一次，就会将指针往后面移动一个。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">DIR *<span class="title">opendir</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *filename)</span></span>;    <span class="comment">//打开一个文件夹，返回一个 DIR指针</span></span><br></pre></td></tr></table></figure>
+<p><br></p>
+<hr>
+<p><br></p>
+<h2 id="读取文件夹下的信息"><a href="#读取文件夹下的信息" class="headerlink" title="读取文件夹下的信息"></a>读取文件夹下的信息</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 返回一个dirent结构体指针</span></span><br><span class="line"><span class="function">struct dirent *<span class="title">readdir</span><span class="params">(DIR *dirp)</span></span>;    <span class="comment">//传入一个DIR指针</span></span><br></pre></td></tr></table></figure>
+<p>这个<code>dirent</code>结构体的成员为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">dirent</span> &#123;</span></span><br><span class="line">	<span class="keyword">ino_t</span>  d_ino;             <span class="comment">/* inode number(此目录进入点的 inode) */</span></span><br><span class="line">	<span class="keyword">off_t</span>  d_off;             <span class="comment">/* offset to the next dirent(目录开头到进入点的位移 */</span></span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">short</span> d_reclen;  <span class="comment">/* length of this record(目录名的长度) */</span></span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">char</span> d_type;     <span class="comment">/* type of file(所指的文件类型) 举例: 4为文件夹*/</span></span><br><span class="line">	<span class="keyword">char</span>   d_name[<span class="number">256</span>];       <span class="comment">/* filename(文件名) */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="示例一：打印当前目录的所有文件"><a href="#示例一：打印当前目录的所有文件" class="headerlink" title="示例一：打印当前目录的所有文件"></a>示例一：打印当前目录的所有文件</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    DIR *dir;</span><br><span class="line">    dir = opendir(argv[<span class="number">1</span>]);</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dirent</span> *<span class="title">p</span>;</span></span><br><span class="line">    <span class="keyword">while</span>((p = readdir(dir))) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"inode = %llu, len = %d, type = %d,  filename = %s\n"</span>, p-&gt;d_ino, p-&gt;d_reclen, p-&gt;d_type, p-&gt;d_name);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    closedir(dir);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="示例二：文件夹的深度遍历"><a href="#示例二：文件夹的深度遍历" class="headerlink" title="示例二：文件夹的深度遍历"></a>示例二：文件夹的深度遍历</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">printDir</span><span class="params">(<span class="keyword">char</span> *path, <span class="keyword">int</span> width)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    DIR *dir;</span><br><span class="line">    dir = opendir(path);</span><br><span class="line">    ERROR_CHECK(dir, <span class="literal">NULL</span>, <span class="string">"opendir"</span>);</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dirent</span> *<span class="title">p</span>;</span></span><br><span class="line">    <span class="keyword">char</span> buf[<span class="number">1024</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>((p = readdir(dir))) &#123;</span><br><span class="line">        <span class="keyword">if</span>(!<span class="built_in">strcmp</span>(p-&gt;d_name,<span class="string">"."</span>) || !<span class="built_in">strcmp</span>(p-&gt;d_name, <span class="string">".."</span>)) &#123;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"%*s%s\n"</span>, width, <span class="string">" "</span>,  p-&gt;d_name);</span><br><span class="line">        <span class="built_in">sprintf</span>(buf, <span class="string">"%s%s%s"</span>,path, <span class="string">"/"</span>, p-&gt;d_name);</span><br><span class="line">        <span class="keyword">if</span>(p-&gt;d_type == <span class="number">4</span>) &#123;</span><br><span class="line">            printDir(buf, width+<span class="number">4</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    closedir(dir);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ARGS_CHECK(argc, <span class="number">2</span>);</span><br><span class="line">    <span class="built_in">puts</span>(argv[<span class="number">1</span>]);</span><br><span class="line">    printDir(argv[<span class="number">1</span>], <span class="number">4</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<hr>
+<p><br></p>
+<h2 id="文件夹定位"><a href="#文件夹定位" class="headerlink" title="文件夹定位"></a>文件夹定位</h2><h3 id="telldir"><a href="#telldir" class="headerlink" title="telldir"></a>telldir</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">off_t</span> telldir(DIR *dir);    <span class="comment">//返回目录流当前的读取位置</span></span><br></pre></td></tr></table></figure>
+<h3 id="seekdir"><a href="#seekdir" class="headerlink" title="seekdir"></a>seekdir</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">seekdir</span><span class="params">(DIR *dir, <span class="keyword">off_t</span> offset)</span></span>;    <span class="comment">//用来设置目录流当前的读取位置</span></span><br></pre></td></tr></table></figure>
+<h3 id="rewinddir"><a href="#rewinddir" class="headerlink" title="rewinddir"></a>rewinddir</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rewinddir</span><span class="params">(DIR *dir)</span></span>;   <span class="comment">//重新定位到目录文件的头部</span></span><br></pre></td></tr></table></figure>
+<h3 id="示例一：打印-seekdir-c-文件的下一个文件"><a href="#示例一：打印-seekdir-c-文件的下一个文件" class="headerlink" title="示例一：打印 seekdir.c 文件的下一个文件"></a>示例一：打印 seekdir.c 文件的下一个文件</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ARGS_CHECK(argc, <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    DIR* dir;</span><br><span class="line">    dir = opendir(argv[<span class="number">1</span>]);</span><br><span class="line">    ERROR_CHECK(dir, <span class="literal">NULL</span>, <span class="string">"opendir"</span>);</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dirent</span> *<span class="title">p</span>;</span></span><br><span class="line">    <span class="keyword">off_t</span> pos;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>((p = readdir(dir))) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"inode = %ld, len = %d, type = %d, filename = %s\n"</span>, p-&gt;d_ino, p-&gt;d_reclen, p-&gt;d_type, p-&gt;d_name);</span><br><span class="line">        <span class="keyword">if</span>(!<span class="built_in">strcmp</span>(p-&gt;d_name, <span class="string">"seekdir.c"</span>)) &#123;</span><br><span class="line">            pos = telldir(dir);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//rewinddir(dir);</span></span><br><span class="line">    seekdir(dir, pos);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"----------------------------------------------------\n"</span>);</span><br><span class="line">    p = readdir(dir);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"inode = %ld, len = %d, type = %d, filename = %s\n"</span>, p-&gt;d_ino, p-&gt;d_reclen, p-&gt;d_type, p-&gt;d_name);</span><br><span class="line"></span><br><span class="line">    closedir(dir);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<hr>
+<p><br></p>
+<h2 id="几个文件夹的函数"><a href="#几个文件夹的函数" class="headerlink" title="几个文件夹的函数"></a>几个文件夹的函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 修改当前目录，即切换目录，相当于 cd 命令</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">chdir</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *path)</span></span>;    <span class="comment">// 修改后的路径</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/02/21/排序算法/" rel="next" title="排序算法">
+                <i class="fa fa-chevron-left"></i> 排序算法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.png" alt="0ran9e">
+            
+              <p class="site-author-name" itemprop="name">0ran9e</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:971109888@qq.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://weibo.com/3190492602" target="_blank" title="微博"><i class="fa fa-fw fa-weibo"></i>微博</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#文件操作"><span class="nav-number">1.</span> <span class="nav-text">文件操作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#打开、关闭文件"><span class="nav-number">1.1.</span> <span class="nav-text">打开、关闭文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#open、close"><span class="nav-number">1.1.1.</span> <span class="nav-text">open、close</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#示例一：使用open打开一个文件"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">示例一：使用open打开一个文件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fopen、fclose"><span class="nav-number">1.1.2.</span> <span class="nav-text">fopen、fclose</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#示例一：文件指针转换文件描述符"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">示例一：文件指针转换文件描述符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#示例二：文件描述符转换文件指针"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">示例二：文件描述符转换文件指针</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读、写文件"><span class="nav-number">1.2.</span> <span class="nav-text">读、写文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#read、write"><span class="nav-number">1.2.1.</span> <span class="nav-text">read、write</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#示例一：read的简单示例"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">示例一：read的简单示例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#示例二：write的简单示例"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">示例二：write的简单示例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fread、fwrite"><span class="nav-number">1.2.2.</span> <span class="nav-text">fread、fwrite</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#改变文件大小"><span class="nav-number">1.3.</span> <span class="nav-text">改变文件大小</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#truncate"><span class="nav-number">1.3.1.</span> <span class="nav-text">truncate</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ftruncate"><span class="nav-number">1.3.2.</span> <span class="nav-text">ftruncate</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件定位"><span class="nav-number">1.4.</span> <span class="nav-text">文件定位</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#lseek"><span class="nav-number">1.4.1.</span> <span class="nav-text">lseek</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fseek"><span class="nav-number">1.4.2.</span> <span class="nav-text">fseek</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例一：lseek的简单示例"><span class="nav-number">1.4.3.</span> <span class="nav-text">示例一：lseek的简单示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例二：lseek实现文件空洞"><span class="nav-number">1.4.4.</span> <span class="nav-text">示例二：lseek实现文件空洞</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取文件信息"><span class="nav-number">1.5.</span> <span class="nav-text">获取文件信息</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#stat"><span class="nav-number">1.5.1.</span> <span class="nav-text">stat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fstat"><span class="nav-number">1.5.2.</span> <span class="nav-text">fstat</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#示例一：打印文件的文件状态"><span class="nav-number">1.5.2.1.</span> <span class="nav-text">示例一：打印文件的文件状态</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内存映射"><span class="nav-number">1.6.</span> <span class="nav-text">内存映射</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#mmap、munmap"><span class="nav-number">1.6.1.</span> <span class="nav-text">mmap、munmap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例一：mmap简单示例"><span class="nav-number">1.6.2.</span> <span class="nav-text">示例一：mmap简单示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件描述符的复制"><span class="nav-number">1.7.</span> <span class="nav-text">文件描述符的复制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#dup"><span class="nav-number">1.7.1.</span> <span class="nav-text">dup</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dup2"><span class="nav-number">1.7.2.</span> <span class="nav-text">dup2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例一：dup版重定向标准输出"><span class="nav-number">1.7.3.</span> <span class="nav-text">示例一：dup版重定向标准输出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例二：dup2版重定向标准输出"><span class="nav-number">1.7.4.</span> <span class="nav-text">示例二：dup2版重定向标准输出</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#几个常用的文件操作函数"><span class="nav-number">1.8.</span> <span class="nav-text">几个常用的文件操作函数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#文件夹操作"><span class="nav-number">2.</span> <span class="nav-text">文件夹操作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建文件夹"><span class="nav-number">2.1.</span> <span class="nav-text">创建文件夹</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除文件夹"><span class="nav-number">2.2.</span> <span class="nav-text">删除文件夹</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#打开文件夹"><span class="nav-number">2.3.</span> <span class="nav-text">打开文件夹</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读取文件夹下的信息"><span class="nav-number">2.4.</span> <span class="nav-text">读取文件夹下的信息</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#示例一：打印当前目录的所有文件"><span class="nav-number">2.4.1.</span> <span class="nav-text">示例一：打印当前目录的所有文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例二：文件夹的深度遍历"><span class="nav-number">2.4.2.</span> <span class="nav-text">示例二：文件夹的深度遍历</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件夹定位"><span class="nav-number">2.5.</span> <span class="nav-text">文件夹定位</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#telldir"><span class="nav-number">2.5.1.</span> <span class="nav-text">telldir</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#seekdir"><span class="nav-number">2.5.2.</span> <span class="nav-text">seekdir</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rewinddir"><span class="nav-number">2.5.3.</span> <span class="nav-text">rewinddir</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例一：打印-seekdir-c-文件的下一个文件"><span class="nav-number">2.5.4.</span> <span class="nav-text">示例一：打印 seekdir.c 文件的下一个文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#几个文件夹的函数"><span class="nav-number">2.6.</span> <span class="nav-text">几个文件夹的函数</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">0ran9e</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.2.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.2.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.2.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.2.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.2.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.2.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.2.0"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

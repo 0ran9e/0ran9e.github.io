@@ -298,6 +298,219 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://0ran9e.com/2020/03/01/Linux系统编程/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="0ran9e">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="0ran9e's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/03/01/Linux系统编程/" itemprop="url">
+                  Linux系统编程
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2020-03-01 17:00:42" itemprop="dateCreated datePublished" datetime="2020-03-01T17:00:42+08:00">2020-03-01</time>
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/计算机/" itemprop="url" rel="index"><span itemprop="name">计算机</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="文件操作"><a href="#文件操作" class="headerlink" title="文件操作"></a>文件操作</h1><p>注意区分<strong>系统调用</strong>和<strong>标准C库函数</strong>，一般来说，使用文件描述符的是系统调用，而使用文件指针的是标准C库函数。</p>
+<h2 id="打开、关闭文件"><a href="#打开、关闭文件" class="headerlink" title="打开、关闭文件"></a>打开、关闭文件</h2><h3 id="open、close"><a href="#open、close" class="headerlink" title="open、close"></a>open、close</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//打开一个文件，返回其文件描述符。</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">open</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, <span class="keyword">int</span> flags)</span></span>;    <span class="comment">//文件路径 打开方式</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">open</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, <span class="keyword">int</span> flags, <span class="keyword">mode_t</span> mode)</span></span>;    <span class="comment">//文件路径 打开方式 创建时用的权限</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//关闭一个文件，成功返回0，失败返回-1</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">close</span><span class="params">(<span class="keyword">int</span> fildes)</span></span>;    <span class="comment">//文件描述符</span></span><br></pre></td></tr></table></figure>
+<p>flags 和 mode 都是一组掩码的合成值，flags 表示打开或创建的方式，mode 表示文件的访问权限。</p>
+<p>其中flags的可选项有：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">掩码</th>
+<th style="text-align:center">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">O_RDONLY</td>
+<td style="text-align:center">以只读的方式打开</td>
+</tr>
+<tr>
+<td style="text-align:center">O_WRONLY</td>
+<td style="text-align:center">以只写的方式打开</td>
+</tr>
+<tr>
+<td style="text-align:center">O_RDWR</td>
+<td style="text-align:center">以读写的方式打开</td>
+</tr>
+<tr>
+<td style="text-align:center">O_CREAT</td>
+<td style="text-align:center">如果文件不存在，则创建文件</td>
+</tr>
+<tr>
+<td style="text-align:center">O_EXCL</td>
+<td style="text-align:center">仅与 O_CREAT 连用，如果文件已存在，则强 制 open 失败</td>
+</tr>
+<tr>
+<td style="text-align:center">O_TRUNC</td>
+<td style="text-align:center">如果文件存在，将文件的长度截至 0</td>
+</tr>
+<tr>
+<td style="text-align:center">O_APPEND</td>
+<td style="text-align:center">已追加的方式打开文件，每次调用 write 时， 文件指针自动先移到文件尾，用于多进程写同一个文件的情况。</td>
+</tr>
+<tr>
+<td style="text-align:center">O_NONBLOCK</td>
+<td style="text-align:center">非阻塞方式打开，无论有无数据读取或等 待，都会立即返回进程之中。</td>
+</tr>
+<tr>
+<td style="text-align:center">O_NODELAY</td>
+<td style="text-align:center">非阻塞方式打开</td>
+</tr>
+<tr>
+<td style="text-align:center">O_SYNC</td>
+<td style="text-align:center">同步打开文件，只有在数据被真正写入物理设备设备后才返回。用得不多，对磁盘伤害比较大。</td>
+</tr>
+</tbody>
+</table>
+</div>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/03/01/Linux系统编程/#更多" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://0ran9e.com/2020/02/21/排序算法/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -494,7 +707,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-count">2</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -524,7 +737,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">1</span>
+                      
+                    
+                    <span class="site-state-item-count">2</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -778,6 +993,8 @@
 
   
   
+    
+      
     
       
     
