@@ -614,9 +614,6 @@
 <h3 id="添加用户"><a href="#添加用户" class="headerlink" title="添加用户"></a>添加用户</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">useradd 用户名</span><br><span class="line"><span class="meta">#</span> 添加参数 -m 才会在 /home 下建立一个名为 "用户名" 的目录</span><br><span class="line"><span class="meta">#</span> Ubuntu下需要 -s /bin/bash 指定使用的脚本解析器</span><br></pre></td></tr></table></figure>
 <h3 id="设置密码"><a href="#设置密码" class="headerlink" title="设置密码"></a>设置密码</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">passwd 用户名</span><br><span class="line"><span class="meta">#</span> 只有root用户才可以给新创建的用户配置密码</span><br></pre></td></tr></table></figure>
 <h3 id="删除用户"><a href="#删除用户" class="headerlink" title="删除用户"></a>删除用户</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">userdel 用户名</span><br><span class="line"><span class="meta">#</span> 删除用户后，其家目录并不会被删除，如果要删除家目录需要 -r</span><br></pre></td></tr></table></figure>
-<p><br></p>
-<hr>
-<p><br></p>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2020/02/27/Linux常用指令/#更多" rel="contents">
